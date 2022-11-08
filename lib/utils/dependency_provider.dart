@@ -8,13 +8,12 @@ import 'package:real_reddit/utils/rsa_key_helper.dart';
 class DependencyProvider extends InheritedWidget {
 
   static DependencyProvider of(BuildContext context) {
-    return (context.inheritFromWidgetOfExactType(DependencyProvider)
+    return (context.dependOnInheritedWidgetOfExactType<DependencyProvider>()
     as DependencyProvider);
   }
 
   DependencyProvider({
-    Key key,
-    Widget child,
+     key, child,
   }) : super(key: key, child: child);
 
   @override

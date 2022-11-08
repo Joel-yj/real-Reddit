@@ -27,7 +27,7 @@ class RsaKeyHelper {
     for (int i = 0; i < 32; i++) {
       seeds.add(random.nextInt(255));
     }
-    secureRandom.seed(new KeyParameter(new Uint8List.fromList(seeds)));
+    secureRandom.seed(KeyParameter(Uint8List.fromList(seeds)));
     return secureRandom;
   }
 
@@ -54,7 +54,8 @@ class RsaKeyHelper {
   /// }
   RSAPublicKey parsePublicKeyFromPem(pemString) {
     List<int> publicKeyDER = decodePEM(pemString);
-    var asn1Parser = new ASN1Parser(publicKeyDER);
+    Uint8List test = Uint8List.fromList(publicKeyDER);
+    var asn1Parser = ASN1Parser(test);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
     var modulus, exponent;
@@ -65,8 +66,8 @@ class RsaKeyHelper {
     } else {
       var publicKeyBitString = topLevelSeq.elements[1];
 
-      var publicKeyAsn = new ASN1Parser(publicKeyBitString.contentBytes());
-      ASN1Sequence publicKeySeq = publicKeyAsn.nextObject();
+      var publicKeyAsn = ASN1Parser(publicKeyBitString.contentBytes()!);
+      ASN1Sequence publicKeySeq = publicKeyAsn.nextObject() as ASN1Sequence;
       modulus = publicKeySeq.elements[0] as ASN1Integer;
       exponent = publicKeySeq.elements[1] as ASN1Integer;
     }
@@ -100,7 +101,8 @@ class RsaKeyHelper {
   /// [RSAPrivateKey]
   RSAPrivateKey parsePrivateKeyFromPem(pemString) {
     List<int> privateKeyDER = decodePEM(pemString);
-    var asn1Parser = new ASN1Parser(privateKeyDER);
+    Uint8List test = Uint8List.fromList(privateKeyDER);
+    var asn1Parser = ASN1Parser(test);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
     var modulus, privateExponent, p, q;
@@ -108,7 +110,7 @@ class RsaKeyHelper {
     if (topLevelSeq.elements.length == 3) {
       var privateKey = topLevelSeq.elements[2];
 
-      asn1Parser = new ASN1Parser(privateKey.contentBytes());
+      asn1Parser = ASN1Parser(privateKey.contentBytes()!);
       var pkSeq = asn1Parser.nextObject() as ASN1Sequence;
 
       modulus = pkSeq.elements[1] as ASN1Integer;
@@ -185,19 +187,19 @@ class RsaKeyHelper {
   /// Given [RSAPrivateKey] returns a base64 encoded [String] with standard PEM headers and footers
   String encodePrivateKeyToPemPKCS1(RSAPrivateKey privateKey) {
 
-    var topLevel = new ASN1Sequence();
+    var topLevel = ASN1Sequence();
 
     var version = ASN1Integer(BigInt.from(0));
-    var modulus = ASN1Integer(privateKey.n);
-    var publicExponent = ASN1Integer(privateKey.exponent);
-    var privateExponent = ASN1Integer(privateKey.d);
-    var p = ASN1Integer(privateKey.p);
-    var q = ASN1Integer(privateKey.q);
-    var dP = privateKey.d % (privateKey.p - BigInt.from(1));
+    var modulus = ASN1Integer(privateKey.n!);
+    var publicExponent = ASN1Integer(privateKey.exponent!);
+    var privateExponent = ASN1Integer(privateKey.privateExponent!);
+    var p = ASN1Integer(privateKey.p!);
+    var q = ASN1Integer(privateKey.q!);
+    var dP = privateKey.privateExponent! % (privateKey.p! - BigInt.from(1));
     var exp1 = ASN1Integer(dP);
-    var dQ = privateKey.d % (privateKey.q - BigInt.from(1));
+    var dQ = privateKey.privateExponent! % (privateKey.q! - BigInt.from(1));
     var exp2 = ASN1Integer(dQ);
-    var iQ = privateKey.q.modInverse(privateKey.p);
+    var iQ = privateKey.q!.modInverse(privateKey.p!);
     var co = ASN1Integer(iQ);
 
     topLevel.add(version);
@@ -219,10 +221,10 @@ class RsaKeyHelper {
   ///
   /// Given [RSAPublicKey] returns a base64 encoded [String] with standard PEM headers and footers
   String encodePublicKeyToPemPKCS1(RSAPublicKey publicKey) {
-    var topLevel = new ASN1Sequence();
+    var topLevel = ASN1Sequence();
 
-    topLevel.add(ASN1Integer(publicKey.modulus));
-    topLevel.add(ASN1Integer(publicKey.exponent));
+    topLevel.add(ASN1Integer(publicKey.modulus!));
+    topLevel.add(ASN1Integer(publicKey.exponent!));
 
     var dataBase64 = base64.encode(topLevel.encodedBytes);
     return """-----BEGIN PUBLIC KEY-----\r\n$dataBase64\r\n-----END PUBLIC KEY-----""";
@@ -235,9 +237,9 @@ class RsaKeyHelper {
 /// including a [SecureRandom]
 AsymmetricKeyPair<PublicKey, PrivateKey> getRsaKeyPair(
     SecureRandom secureRandom) {
-  var rsapars = new RSAKeyGeneratorParameters(BigInt.from(65537), 2048, 5);
-  var params = new ParametersWithRandom(rsapars, secureRandom);
-  var keyGenerator = new RSAKeyGenerator();
+  var rsapars = RSAKeyGeneratorParameters(BigInt.from(65537), 2048, 5);
+  var params = ParametersWithRandom(rsapars, secureRandom);
+  var keyGenerator = RSAKeyGenerator();
   keyGenerator.init(params);
   return keyGenerator.generateKeyPair();
 }

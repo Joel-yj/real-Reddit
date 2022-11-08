@@ -6,7 +6,8 @@ void main() {
   // We need to encapsulate `MyApp` with the DependencyProvider in order
   // to be able to access the RSA KeyHelper
   runApp(
-      DependencyProvider(child: MyApp(),)
+      DependencyProvider(key: null,
+      child: MyApp(),)
   );
 }
 

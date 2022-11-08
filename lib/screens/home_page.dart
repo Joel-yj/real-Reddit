@@ -6,7 +6,7 @@ import 'package:real_reddit/utils/dependency_provider.dart';
 TextStyle get whiteTextStyle => TextStyle(color: Colors.white);
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -15,15 +15,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   /// The Future that will show the Pem String
-  Future<String> futureText;
+  late Future<String> futureText;
 
   /// Future to hold the reference to the KeyPair generated with PointyCastle
   /// in order to extract the [crypto.PrivateKey] and [crypto.PublicKey]
-  Future<crypto.AsymmetricKeyPair<crypto.PublicKey, crypto.PrivateKey>>
+  late Future<crypto.AsymmetricKeyPair<crypto.PublicKey, crypto.PrivateKey>>
   futureKeyPair;
 
   /// The current [crypto.AsymmetricKeyPair]
-  crypto.AsymmetricKeyPair keyPair;
+  late crypto.AsymmetricKeyPair keyPair;
 
   /// With the helper [RsaKeyHelper] this method generates a
   /// new [crypto.AsymmetricKeyPair<crypto.PublicKey, crypto.PrivateKey>
@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// GlobalKey to be used when showing the [Snackbar] for the successful
   /// copy of the Key
-  final key = new GlobalKey<ScaffoldState>();
+  final key = GlobalKey<ScaffoldState>();
 
   /// Text Editing Controller to retrieve the text to sign
   TextEditingController _controller = TextEditingController();
@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               MaterialButton(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
                 child: Text(
                   "Generate new Key Pair",
                   style: whiteTextStyle,
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         return Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasData) {
                         // Else, store the new keypair in this state and sbow two buttons
-                        this.keyPair = snapshot.data;
+                        keyPair = snapshot.data!;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
