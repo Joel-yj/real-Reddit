@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "183325267149",
+    "project_id": "real-reddit",
+    "storage_bucket": "real-reddit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183325267149:android:b336be2d9d27031463c584",
+        "android_client_info": {
+          "package_name": "com.example.real_reddit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "183325267149-dvpm064d8g8fthusefh6218k1kect1ui.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmawWtiLzBJJFM2D1MLCEicrPuHXICXyQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "183325267149-dvpm064d8g8fthusefh6218k1kect1ui.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
