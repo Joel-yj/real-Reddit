@@ -6,8 +6,7 @@ void main() {
   // We need to encapsulate `MyApp` with the DependencyProvider in order
   // to be able to access the RSA KeyHelper
   runApp(
-      DependencyProvider(key: null,
-      child: MyApp(),)
+      DependencyProvider(child: MyApp(),)
   );
 }
 
@@ -16,11 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RSA Generator',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'RSA Key Generator'),
+      home: MyHomePage(title: 'Certificate App'),
     );
   }
 }

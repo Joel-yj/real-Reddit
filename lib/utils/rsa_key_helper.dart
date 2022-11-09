@@ -13,8 +13,8 @@ class RsaKeyHelper {
   /// Returns a [AsymmetricKeyPair] based on the [RSAKeyGenerator] with custom parameters,
   /// including a [SecureRandom]
   Future<AsymmetricKeyPair<PublicKey, PrivateKey>> computeRSAKeyPair(
-      SecureRandom secureRandom) async {
-    return await compute(getRsaKeyPair, secureRandom);
+      SecureRandom secureRandom) {
+    return compute(getRsaKeyPair, secureRandom);
   }
 
   /// Generates a [SecureRandom]
@@ -108,8 +108,7 @@ class RsaKeyHelper {
     var modulus, privateExponent, p, q;
     // Depending on the number of elements, we will either use PKCS1 or PKCS8
     if (topLevelSeq.elements.length == 3) {
-      var privateKey = topLevelSeq.elements[2];
-
+      dynamic privateKey = topLevelSeq.elements[2];
       asn1Parser = ASN1Parser(privateKey.contentBytes()!);
       var pkSeq = asn1Parser.nextObject() as ASN1Sequence;
 
