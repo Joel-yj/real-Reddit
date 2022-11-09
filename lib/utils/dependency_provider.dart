@@ -13,8 +13,7 @@ class DependencyProvider extends InheritedWidget {
   }
 
   DependencyProvider({
-    required Key key,
-    required child,
+     key, child,
   }) : super(key: key, child: child);
 
   @override
