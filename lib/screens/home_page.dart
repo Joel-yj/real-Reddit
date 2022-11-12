@@ -10,9 +10,6 @@ import 'package:real_reddit/utils/rsa_key_helper.dart';
 import 'create_cert_page.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({key, required this.title}) : super(key: key);
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -40,13 +37,15 @@ class _MyHomePageState extends State<MyHomePage> {
             return Card(
               child: ListTile(
                 title: Text(titles[index]),
-                trailing: Icon(Icons.add),
-                onTap: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => CreateCertFormPage()));
-                },
+                trailing: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.group_add_sharp),
+                  label: Text('Join'),
+                ),
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => CreateCertFormPage()));
               ),
             );
           }),
