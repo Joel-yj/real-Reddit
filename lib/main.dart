@@ -21,51 +21,18 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-
-  void action() {
-    var secureRan = rsaHelper.getSecureRandom();
-    var priKeyHex =
-        (rsaHelper.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
-            .modulus
-            ?.toRadixString(16);
-
-    db
-        .collection("Users")
-        .doc("Alice")
-        .set({"PrivateKey": priKeyHex}, SetOptions(merge: true));
-    setState(() {
-      key = priKeyHex as String;
-    });
-  }
-
-  var key = '';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'RSA Generator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            Text(key),
-            FloatingActionButton(onPressed: () {
-              // check issued by
-            }),
-          ],
-        ),
-      ),
-      // home: MyHomePage(title: 'RSA Key Generator'),
+      home: MyHomePage(title: 'RSA Key Generator'),
     );
   }
 }
