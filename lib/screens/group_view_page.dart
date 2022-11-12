@@ -15,7 +15,7 @@ class GroupViewPage extends StatefulWidget {
 class _GroupViewPageState extends State<GroupViewPage> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // TODO: Implement Certificate check algorithm
 
     final titles = ["Bob", "Malicious"];
 

@@ -26,11 +26,9 @@ void main() async {
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
-  var certToBe = CertificateTemplate();
-  var db = FirebaseFirestore.instance;
-  RsaKeyHelper rsahelp = RsaKeyHelper();
-
-  var key = '';
+  // var certToBe = CertificateTemplate();
+  // var db = FirebaseFirestore.instance;
+  // RsaKeyHelper rsahelp = RsaKeyHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: HomePage(),
     );
   }
 }
