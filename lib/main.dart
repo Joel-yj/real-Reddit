@@ -29,21 +29,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
 
-  void action() {
-    var secureRan = rsaHelper.getSecureRandom();
-    var priKeyHex =
-        (rsaHelper.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
-            .modulus
-            ?.toRadixString(16);
-
-    db
-        .collection("Users")
-        .doc("Alice")
-        .set({"PrivateKey": priKeyHex}, SetOptions(merge: true));
-    setState(() {
-      key = priKeyHex as String;
-    });
-  }
+  var certToBe = CertificateTemplate();
+  var db = FirebaseFirestore.instance;
+  RsaKeyHelper rsahelp = RsaKeyHelper();
 
   var key = '';
 
@@ -60,7 +48,14 @@ class _MyAppState extends State<MyApp> {
           children: [
             Text(key),
             FloatingActionButton(onPressed: () {
-              // check issued by
+              certToBe.request();
+
+              db
+                  .collection("Users/Alice/Certificates")
+                  .doc()
+                  .set(certToBe.toJson());
+              // db.collection("Alice/Certficates").doc().set(data);
+              // certToBe.signing();
             }),
           ],
         ),

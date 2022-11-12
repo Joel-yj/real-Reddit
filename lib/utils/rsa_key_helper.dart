@@ -7,11 +7,6 @@ import "package:pointycastle/export.dart";
 
 /// Helper class to handle RSA key generation and encoding
 class RsaKeyHelper {
-  Future<AsymmetricKeyPair<PublicKey, PrivateKey>> computeRSAKeyPair(
-      SecureRandom secureRandom) async {
-    return await compute(getRsaKeyPair, secureRandom);
-  }
-
   /// Generates a [SecureRandom]
   /// Returns [FortunaRandom] to be used in the [AsymmetricKeyPair] generation
   SecureRandom getSecureRandom() {
@@ -38,18 +33,11 @@ class RsaKeyHelper {
 
     var keyGenerator = RSAKeyGenerator();
     keyGenerator.init(params);
-    print("generating next");
+
     final pair = keyGenerator.generateKeyPair();
 
     var myPublic = pair.publicKey as RSAPublicKey;
     var myPrivate = pair.privateKey as RSAPrivateKey;
-    print("public");
-    print(myPublic.publicExponent);
-    print(myPublic.modulus);
-    print("private");
-    print(myPrivate.privateExponent);
-    print(myPrivate.modulus);
-    print((myPublic.publicExponent)?.toRadixString(16));
 
     return AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>(myPublic, myPrivate);
   }
