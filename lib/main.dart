@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -26,18 +27,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  RsaKeyHelper test = RsaKeyHelper();
+  var db = FirebaseFirestore.instance;
+
   void action() {
-    print("hello world");
-    RsaKeyHelper test = RsaKeyHelper();
-    print("hello world 2");
     var secureRan = test.getSecureRandom();
-    var res = (test.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
+    var priKeyHex = (test.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
         .modulus
         ?.toRadixString(16);
+
+    db
+        .collection("Users")
+        .doc("Alice")
+        .set({"PrivateKey": priKeyHex}, SetOptions(merge: true));
     setState(() {
-      key = res as String;
+      key = priKeyHex as String;
     });
-    print('hella');
   }
 
   var key = '';
