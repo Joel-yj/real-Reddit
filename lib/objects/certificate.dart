@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pointycastle/asymmetric/api.dart';
@@ -20,9 +22,24 @@ class CertificateTemplate {
     return {
       "ReceivedBy": receivedBy,
       "IssueBy": issueBy,
-      "PublicKey": subPubKey?.publicExponent.toString(),
+      "PublicKeyEx": subPubKey?.publicExponent.toString(),
+      "PublickeyMod": subPubKey?.modulus.toString(),
       "Message": message,
+      //TODO: "EncryptedMessage" :
     };
+  }
+
+  CertificateTemplate fromJson(dynamic json) {
+    RSAPublicKey rsaPublicKey = RSAPublicKey(
+        BigInt.parse(json["PublickeyMod"] as String),
+        BigInt.parse(json["PublicKeyEx"] as String));
+
+    return CertificateTemplate(
+      receivedBy: json["ReceivedBy"] as String,
+      issueBy: json["IssueBy"] as String,
+      subPubKey: rsaPublicKey,
+      message: json["Message"] as String,
+    );
   }
 
   //decrypt message
@@ -37,62 +54,36 @@ class CertificateTemplate {
   void request() {
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-    subPubKey = res.publicKey as RSAPublicKey;
     var subPriKey = res.privateKey as RSAPrivateKey;
-    print(subPriKey.privateExponent);
 
-    // put receiveby(alice)
     // public key into the cert template
+    subPubKey = res.publicKey as RSAPublicKey;
 
-    // update firebase alice
-    db.collection("Users").doc("Alice").set(
+    // put receiveby(alice) TODO: no hardcode?
+    receivedBy = "Alice";
+
+    // TODO: do ELSEWHERE update firebase for Alice private key
+    db.collection("Users").doc(receivedBy).set(
         {"PrivateKey": subPriKey.privateExponent.toString()},
         SetOptions(merge: true));
-
-    // var cert = {
-    //   "IssuedBy": "",
-    //   "ReceivedBy": "Alice",
-    //   "message": "",
-    //   "PublicKey": alicePubKey.publicExponent.toString(),
-    // };
-
-    // db
-    //     .collection("Users")
-    //     .doc("Alice")
-    //     .collection("Certificates")
-    //     .doc()
-    //     .set(cert, SetOptions(merge: true));
   }
 
-  // void signing() {
-  //   // make a string: "${new participant} belongs to ${lesson}"
-  //   String plainText = "This is a test msg";
+  //TODO: #JOEL# sign(String lesson) - input grp name
+  void sign() {
+    // make a string: "${new participant} belongs to ${lesson}"
+    String plainText = "This is a test msg";
 
-  //   // get {lesson} private key and sign
-  //   var signerPrikey = db.collection("Users").doc("CE4010").get
-  //   // var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-  //   // var adminPubKey = res.publicKey as RSAPublicKey;
-  //   // var adminPriKey = res.privateKey as RSAPrivateKey;
-
-  //   var signed = rsaHelper.rsaSign(adminPriKey, plainText);
-  //   print(signed);
-
-  //   var cert = {
-  //     "IssuedBy": "Admin",
-  //     "message": plainText,
-  //     "encryptedMsg": signed,
-  //   };
-
-  //   db
-  //       .collection("Users")
-  //       .doc("Alice")
-  //       .collection("Certificates")
-  //       .doc()
-  //       .set(cert, SetOptions(merge: true));
-
-  //   var readSigned = rsaHelper.rsaVerify(adminPubKey, plainText, signed);
-  //   print(readSigned);
-  // }
+    // get {lesson} private key and sign
+    var signerPrikey = db
+        .collection("Users/Alice/Certificates")
+        .doc("Cert2")
+        .get()
+        .then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      print(data);
+      print(fromJson(data));
+    });
+  }
 
   void updateCertBase() {}
 }

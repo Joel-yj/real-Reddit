@@ -29,9 +29,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
 
-  var certToBe = CertificateTemplate();
   var db = FirebaseFirestore.instance;
-  RsaKeyHelper rsahelp = RsaKeyHelper();
+  var certToBe = CertificateTemplate();
 
   var key = '';
 
@@ -48,14 +47,13 @@ class _MyAppState extends State<MyApp> {
           children: [
             Text(key),
             FloatingActionButton(onPressed: () {
-              certToBe.request();
+              // certToBe.request();
+              // db
+              //     .collection("Users/Alice/Certificates")
+              //     .doc()
+              //     .set(certToBe.toJson());
 
-              db
-                  .collection("Users/Alice/Certificates")
-                  .doc()
-                  .set(certToBe.toJson());
-              // db.collection("Alice/Certficates").doc().set(data);
-              // certToBe.signing();
+              certToBe.sign();
             }),
           ],
         ),
