@@ -26,50 +26,16 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
-  RsaKeyHelper test = RsaKeyHelper();
-  var db = FirebaseFirestore.instance;
-
-  void action() {
-    var secureRan = test.getSecureRandom();
-    var priKeyHex = (test.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
-        .modulus
-        ?.toRadixString(16);
-
-    db
-        .collection("Users")
-        .doc("Alice")
-        .set({"PrivateKey": priKeyHex}, SetOptions(merge: true));
-    setState(() {
-      key = priKeyHex as String;
-    });
-  }
-
-  var key = '';
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'RSA Generator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            Text(key),
-            FloatingActionButton(onPressed: action),
-          ],
-        ),
-      ),
-      // home: MyHomePage(title: 'RSA Key Generator'),
+      home: MyHomePage(title: 'RSA Key Generator'),
     );
   }
 }
