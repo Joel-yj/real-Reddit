@@ -14,12 +14,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // print("hello world");
-  // RsaKeyHelper test = RsaKeyHelper();
-  // print("hello world 2");
-  // var secureRan = test.getSecureRandom();
-  // var res = test.getRsaKeyPair(secureRan);
-  // print('hella');
 
   runApp(
     MyApp(),
