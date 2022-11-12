@@ -5,15 +5,15 @@ import 'package:pointycastle/api.dart' as crypto;
 import 'package:real_reddit/utils/dependency_provider.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
 
-TextStyle get whiteTextStyle => TextStyle(color: Colors.white);
+// TextStyle get whiteTextStyle => TextStyle(color: Colors.white);
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({key, required this.title}) : super(key: key);
   final String title;
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+//   @override
+//   _MyHomePageState createState() => _MyHomePageState();
+// }
 
 class _MyHomePageState extends State<MyHomePage> {
   // /// The Future that will show the Pem String
