@@ -30,21 +30,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final titles = ["CZ4010", "CZ4020"];
 
-    return ListView.builder(
-        itemCount: titles.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(titles[index]),
-              trailing: Icon(Icons.add),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateCertFormPage()));
-              },
-            ),
-          );
-        });
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('RSA Certificate App'),
+      ),
+      body: ListView.builder(
+          itemCount: titles.length,
+          itemBuilder: (context, index) {
+            return Card(
+              child: ListTile(
+                title: Text(titles[index]),
+                trailing: Icon(Icons.add),
+                onTap: () {
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => CreateCertFormPage()));
+                },
+              ),
+            );
+          }),
+    );
   }
 }
