@@ -11,8 +11,8 @@ class _CertViewPageState extends State<CertViewPage> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body: ,
-    )
+      body: Row(),
+    );
   }
   
   
