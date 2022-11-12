@@ -30,7 +30,7 @@ class RsaKeyHelper {
   /// including a [SecureRandom]
   AsymmetricKeyPair<PublicKey, PrivateKey> getRsaKeyPair(
       SecureRandom secureRandom) {
-    print('in RSA key pair');
+    // print('in RSA key pair');
 
     var rsapars =
         RSAKeyGeneratorParameters(BigInt.from(65537), 512, 5); // the man put 5
@@ -43,8 +43,14 @@ class RsaKeyHelper {
 
     var myPublic = pair.publicKey as RSAPublicKey;
     var myPrivate = pair.privateKey as RSAPrivateKey;
+    print("public");
+    print(myPublic.publicExponent);
     print(myPublic.modulus);
-    print((myPublic.modulus)?.toRadixString(16));
+    print("private");
+    print(myPrivate.hashCode);
+    print(myPrivate.modulus);
+    print((myPublic.publicExponent)?.toRadixString(16));
+
     return AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>(myPublic, myPrivate);
   }
 }
