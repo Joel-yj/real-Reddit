@@ -14,12 +14,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // print("hello world");
-  // RsaKeyHelper test = RsaKeyHelper();
-  // print("hello world 2");
-  // var secureRan = test.getSecureRandom();
-  // var res = test.getRsaKeyPair(secureRan);
-  // print('hella');
 
   runApp(
     MyApp(),
@@ -36,23 +30,6 @@ class _MyAppState extends State<MyApp> {
   RsaKeyHelper test = RsaKeyHelper();
   var db = FirebaseFirestore.instance;
 
-  void action() {
-    var secureRan = test.getSecureRandom();
-    var priKeyHex = (test.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
-        .modulus
-        ?.toRadixString(16);
-
-    db
-        .collection("Users")
-        .doc("Alice")
-        .set({"PrivateKey": priKeyHex}, SetOptions(merge: true));
-    setState(() {
-      key = priKeyHex as String;
-    });
-  }
-
-  var key = '';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -62,12 +39,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: Scaffold(
         appBar: AppBar(),
-        body: Column(
-          children: [
-            Text(key),
-            FloatingActionButton(onPressed: action),
-          ],
-        ),
+        body: Column(),
       ),
       // home: MyHomePage(title: 'RSA Key Generator'),
     );
