@@ -89,12 +89,15 @@ class CertificateTemplate {
           BigInt.parse(data["p"] as String),
           BigInt.parse(data["q"] as String));
 
-      print(rebuildKey.publicExponent);
       return rebuildKey;
     });
 
+    // issue by ${lesson}
+    issueBy = "CZ4010";
+
     // encrypt message for verification
     encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
+    print("in function: $encryptedMsgBytes");
   }
 
   //decrypt message

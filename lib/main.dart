@@ -57,10 +57,10 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             Text(key),
-            FloatingActionButton(onPressed: () {
+            FloatingActionButton(onPressed: () async {
               // certToBe.request();
-              // certToBe.sign();
-              // // push cert to firebase
+              // await certToBe.sign(); // must put await
+              // push cert to firebase
               // db
               //     .collection("Users/dad/Certificates")
               //     .doc()
