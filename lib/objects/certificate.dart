@@ -10,6 +10,7 @@ class CertificateTemplate {
   String? issueBy;
   String? message;
   RSAPublicKey? subPubKey;
+  List? encryptedMsgBytes;
 
   var rsaHelper = RsaKeyHelper();
   var db = FirebaseFirestore.instance;
@@ -35,7 +36,7 @@ class CertificateTemplate {
         BigInt.parse(json["PublicKeyEx"] as String));
 
     return CertificateTemplate(
-      receivedBy: json["ReceivedBy"] as String,
+      receivedBy: json["ReceiveBy"] as String,
       issueBy: json["IssueBy"] as String,
       subPubKey: rsaPublicKey,
       message: json["Message"] as String,
@@ -69,20 +70,26 @@ class CertificateTemplate {
   }
 
   //TODO: #JOEL# sign(String lesson) - input grp name
-  void sign() {
+  Future<void> sign() async {
     // make a string: "${new participant} belongs to ${lesson}"
     String plainText = "This is a test msg";
 
     // get {lesson} private key and sign
     var signerPrikey = db
-        .collection("Users/Alice/Certificates")
-        .doc("Cert2")
+        .collection("Users") //lesson
+        .doc("CZ4010")
         .get()
         .then((DocumentSnapshot doc) {
       final data = doc.data() as Map<String, dynamic>;
-      print(data);
-      print(fromJson(data));
+      RSAPrivateKey rebuildKey = RSAPrivateKey(
+          BigInt.parse(data["Modulus"] as String),
+          BigInt.parse(data["PrivateKey"] as String),
+          BigInt.parse(data["p"] as String),
+          BigInt.parse(data["q"] as String));
+      return rebuildKey;
     });
+
+    encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, plainText);
   }
 
   void updateCertBase() {}
