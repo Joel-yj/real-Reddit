@@ -24,9 +24,6 @@ class CertificateTemplate {
       this.encryptedMsgBytes});
 
   Map<String, dynamic> toJson() {
-    print(encryptedMsgBytes);
-    var test = jsonEncode(encryptedMsgBytes);
-    print(test);
     return {
       "ReceivedBy": receivedBy,
       "IssueBy": issueBy,
@@ -49,23 +46,6 @@ class CertificateTemplate {
       message: json["Message"] as String,
       encryptedMsgBytes: json["EncryptedMessage"],
     );
-  }
-
-  //decrypt message
-  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
-  bool verifyCert() {
-    //get signers public key
-    var signer = "CZ4010";
-    var signerKey = RSAPublicKey(
-        BigInt.parse(
-            "7501247414949680357271830569015946137768662669558036024010149845928554960295592509389092769892444240588123263867599066019833146675988887468577890112722923"),
-        BigInt.parse("65537"));
-
-    print(message);
-    // get the cert contain 1) plaintext, 2) signed
-    var validorNot = rsaHelper.rsaVerify(
-        signerKey, message!, encryptedMsgBytes as Uint8List);
-    return validorNot;
   }
 
   void request() {
@@ -108,11 +88,40 @@ class CertificateTemplate {
           BigInt.parse(data["PrivateKey"] as String),
           BigInt.parse(data["p"] as String),
           BigInt.parse(data["q"] as String));
+
+      print(rebuildKey.publicExponent);
       return rebuildKey;
     });
 
     // encrypt message for verification
     encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
+  }
+
+  //decrypt message
+  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
+  Future<bool> verifyCert() async {
+    //get signers public key
+    var signer = "CZ4010";
+    var signerKey =
+        db.collection("Users").doc(signer).get().then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+
+      // retrive signers private key
+      RSAPrivateKey rebuildKey = RSAPrivateKey(
+          BigInt.parse(data["Modulus"] as String),
+          BigInt.parse(data["PrivateKey"] as String),
+          BigInt.parse(data["p"] as String),
+          BigInt.parse(data["q"] as String));
+
+      RSAPublicKey pubKey =
+          RSAPublicKey(rebuildKey.modulus!, BigInt.from(65537));
+      return pubKey;
+    });
+
+    // get the cert contain 1) plaintext, 2) signed
+    var validorNot = rsaHelper.rsaVerify(
+        await signerKey, message!, encryptedMsgBytes as Uint8List);
+    return validorNot;
   }
 
   void updateCertBase() {}

@@ -16,6 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // ****** makeshift funct for root and admin keygen
   // RsaKeyHelper kg = RsaKeyHelper();
   // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
   // var pub = asym.publicKey as RSAPublicKey;
@@ -57,13 +58,13 @@ class _MyAppState extends State<MyApp> {
           children: [
             Text(key),
             FloatingActionButton(onPressed: () {
-              certToBe.request();
-              certToBe.sign();
-              // push cert to firebase
-              db
-                  .collection("Users/dad/Certificates")
-                  .doc()
-                  .set(certToBe.toJson());
+              // certToBe.request();
+              // certToBe.sign();
+              // // push cert to firebase
+              // db
+              //     .collection("Users/dad/Certificates")
+              //     .doc()
+              //     .set(certToBe.toJson());
 
               // var verified = certToBe.verifyCert();
               // print(verified);
