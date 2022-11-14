@@ -107,9 +107,9 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
       "p": subPriKey.p.toString(),
       "q": subPriKey.q.toString()
     }, SetOptions(merge: true));
-
-    // public key into the cert template
-    //subPubKey = res.publicKey as RSAPublicKey;
+    
+    db.collection("Users/Certificates")
+    
   }
   //TODO: #JOEL# sign(String lesson) - input grp name
   Future<void> sign() async {
