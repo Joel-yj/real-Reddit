@@ -41,8 +41,11 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            CreateCertFormPage(group: group[index], user: user, res: res,),
+                        builder: (context) => CreateCertFormPage(
+                          group: group[index],
+                          user: user,
+                          res: res,
+                        ),
                       ),
                     );
                   },
@@ -69,6 +72,5 @@ class _HomePageState extends State<HomePage> {
       "q": subPriKey.q.toString()
     }, SetOptions(merge: true));
     return res;
-
   }
 }

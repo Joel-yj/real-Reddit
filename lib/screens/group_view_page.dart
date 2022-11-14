@@ -8,6 +8,13 @@ import 'package:real_reddit/utils/dependency_provider.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
 
 class GroupViewPage extends StatefulWidget {
+  const GroupViewPage(
+  {super.key, required this.group, required this.user, required this.res}
+      );
+  final String user;
+  final String group;
+  final AsymmetricKeyPair res;
+
   @override
   _GroupViewPageState createState() => _GroupViewPageState();
 }
@@ -21,7 +28,7 @@ class _GroupViewPageState extends State<GroupViewPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('CZ4010'),
+        title: Text('${widget.group}'),
       ),
       body: ListView.builder(
           itemCount: titles.length,
@@ -35,10 +42,6 @@ class _GroupViewPageState extends State<GroupViewPage> {
                   label: Text('Message'),
                 ),
               ),
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //         builder: (context) => CreateCertFormPage()));
             );
           }),
     );

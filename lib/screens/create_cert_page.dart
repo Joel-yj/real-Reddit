@@ -123,9 +123,15 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => GroupViewPage()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GroupViewPage(
+                            group: widget.group,
+                            user: widget.user,
+                            res: widget.res,
+                          ),
+                        ),
+                      );
                     },
                     child: Text("Submit"),
                   )
