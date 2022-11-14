@@ -117,6 +117,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       ),
                     ],
                   ),
+               // ElevatedButton(onPressed: (){}, child: child)
               ],
             ),
           ),
@@ -125,17 +126,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     );
   }
 
-  // update firebase for User's public key
-  // var certCol = db.collection("Users/Certificates");
-  // certCol.where("IssueBy", isEqualTo: widget.group).get().then((value) {
-  //   for (var element in value.docs) {
-  //     certCol
-  //         .doc(element.id)
-  //         .set({"PublicKeyEx": res.publicKey.toString() as RSAPublicKey},SetOptions(merge: true));
-  //   }
-  // });
 
-  //TODO: #JOEL# sign(String lesson) - input grp name
   void sign() {
     // get {lesson} private key and sign
     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
@@ -154,7 +145,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
       },
     );
 
-    print("in function: ${cert.encryptedMsgBytes}");
+    //print("in function: ${cert.encryptedMsgBytes}");
   }
 
   //decrypt message
