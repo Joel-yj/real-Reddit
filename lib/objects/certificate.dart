@@ -48,57 +48,9 @@ class CertificateTemplate {
     );
   }
 
-  void request() {
-    // generate key pair
-    var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-    var subPriKey = res.privateKey as RSAPrivateKey;
 
-    // put receiveby(alice) TODO: no hardcode?
-    receivedBy = "dad";
 
-    // TODO: do ELSEWHERE
-    // update firebase for Alice private key
-    db.collection("Users").doc(receivedBy).set({
-      "PrivateKey": subPriKey.privateExponent.toString(),
-      "Modulus": subPriKey.modulus.toString(),
-      "p": subPriKey.p.toString(),
-      "q": subPriKey.q.toString()
-    }, SetOptions(merge: true));
 
-    // public key into the cert template
-    subPubKey = res.publicKey as RSAPublicKey;
-  }
-
-  //TODO: #JOEL# sign(String lesson) - input grp name
-  Future<void> sign() async {
-    // make a string: "${new participant} belongs to ${lesson}"
-    message = "This is a test msg";
-
-    // get {lesson} private key and sign
-    var signerPrikey = db
-        .collection("Users") //lesson
-        .doc("CZ4010")
-        .get()
-        .then((DocumentSnapshot doc) {
-      final data = doc.data() as Map<String, dynamic>;
-
-      // retrive signers private key
-      RSAPrivateKey rebuildKey = RSAPrivateKey(
-          BigInt.parse(data["Modulus"] as String),
-          BigInt.parse(data["PrivateKey"] as String),
-          BigInt.parse(data["p"] as String),
-          BigInt.parse(data["q"] as String));
-
-      return rebuildKey;
-    });
-
-    // issue by ${lesson}
-    issueBy = "CZ4010";
-
-    // encrypt message for verification
-    encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
-    print("in function: $encryptedMsgBytes");
-  }
 
   //decrypt message
   ///TODO: #JOEL# verifyCert(String lesson) - input grp name
