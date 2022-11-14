@@ -6,7 +6,6 @@ import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/utils/dependency_provider.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
-
 import 'create_cert_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,12 +14,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var rsaHelper = RsaKeyHelper();
+  final user = "dad";
+  var db = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
     final group = ["CZ4010", "CZ4020"];
-    const user = "Alice";
+    late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,11 +37,12 @@ class _HomePageState extends State<HomePage> {
                 title: Text(group[index]),
                 trailing: ElevatedButton.icon(
                   onPressed: () {
+                    res = request();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            CreateCertFormPage(group: group[index], user: user),
+                            CreateCertFormPage(group: group[index], user: user, res: res,),
                       ),
                     );
                   },
@@ -49,5 +53,22 @@ class _HomePageState extends State<HomePage> {
             );
           }),
     );
+  }
+
+  // helper function to generate private public key of user
+  crypto.AsymmetricKeyPair request() {
+    // generate key pair
+    var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
+    var subPriKey = res.privateKey as RSAPrivateKey;
+
+    // update firebase for User's private key
+    db.collection("Users").doc(user).set({
+      "PrivateKey": subPriKey.privateExponent.toString(),
+      "Modulus": subPriKey.modulus.toString(),
+      "p": subPriKey.p.toString(),
+      "q": subPriKey.q.toString()
+    }, SetOptions(merge: true));
+    return res;
+
   }
 }

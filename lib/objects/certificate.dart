@@ -28,7 +28,7 @@ class CertificateTemplate {
       "ReceiveBy": receiveBy,
       "IssueBy": issueBy,
       "PublicKeyEx": subPubKey?.publicExponent.toString(),
-      "PublickeyMod": subPubKey?.modulus.toString(),
+      "PublicKeyMod": subPubKey?.modulus.toString(),
       "Message": message,
       "EncryptedMessage": encryptedMsgBytes,
     };
@@ -36,7 +36,7 @@ class CertificateTemplate {
 
   CertificateTemplate fromJson(dynamic json) {
     RSAPublicKey rebuildKey = RSAPublicKey(
-        BigInt.parse(json["PublickeyMod"] as String),
+        BigInt.parse(json["PublicKeyMod"] as String),
         BigInt.parse(json["PublicKeyEx"] as String));
 
     return CertificateTemplate(
@@ -46,33 +46,6 @@ class CertificateTemplate {
       message: json["Message"] as String,
       encryptedMsgBytes: json["EncryptedMessage"],
     );
-  }
-
-  //decrypt message
-  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
-  Future<bool> verifyCert() async {
-    //get signers public key
-    var signer = "CZ4010";
-    var signerKey =
-        db.collection("Users").doc(signer).get().then((DocumentSnapshot doc) {
-      final data = doc.data() as Map<String, dynamic>;
-
-      // retrive signers private key
-      RSAPrivateKey rebuildKey = RSAPrivateKey(
-          BigInt.parse(data["Modulus"] as String),
-          BigInt.parse(data["PrivateKey"] as String),
-          BigInt.parse(data["p"] as String),
-          BigInt.parse(data["q"] as String));
-
-      RSAPublicKey pubKey =
-          RSAPublicKey(rebuildKey.modulus!, BigInt.from(65537));
-      return pubKey;
-    });
-
-    // get the cert contain 1) plaintext, 2) signed
-    var validorNot = rsaHelper.rsaVerify(
-        await signerKey, message!, encryptedMsgBytes as Uint8List);
-    return validorNot;
   }
 
   void updateCertBase() {}
