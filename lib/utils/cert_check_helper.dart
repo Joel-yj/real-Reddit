@@ -11,7 +11,9 @@ class CertCheckHelper {
   var db = FirebaseFirestore.instance;
 
   // returns TRUE for if all the certs are valid, else FALSE
-  //
+  // 1) get trusted source pub key
+  // 2) dumb out all cert of users in certificate, manage with data struct
+  // 3) go thru certs in a chain to check validity
   Future<bool> checking() async {
     String user = "chow"; // TODO:user is chow
     List<CertificateTemplate> listOfCert = [];
