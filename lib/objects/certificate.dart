@@ -50,12 +50,12 @@ class CertificateTemplate {
   }
 
   void request() {
+    // put receiveby(alice) TODO: no hardcode?
+    receiveBy = "chow";
+
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
     var subPriKey = res.privateKey as RSAPrivateKey;
-
-    // put receiveby(alice) TODO: no hardcode?
-    receiveBy = "dad";
 
     // TODO: do ELSEWHERE
     // update firebase for Alice private key
@@ -72,13 +72,16 @@ class CertificateTemplate {
 
   //TODO: #JOEL# sign(String lesson) - input grp name
   Future<void> sign() async {
+    // issue by ${lesson}
+    issueBy = "CE1103";
+
     // make a string: "${new participant} belongs to ${lesson}"
-    message = "This is a test msg";
+    message = "$issueBy signs for chow";
 
     // get {lesson} private key and sign
     var signerPrikey = db
         .collection("Users") //lesson
-        .doc("CZ4010")
+        .doc(issueBy)
         .get()
         .then((DocumentSnapshot doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -93,12 +96,9 @@ class CertificateTemplate {
       return rebuildKey;
     });
 
-    // issue by ${lesson}
-    issueBy = "CZ4010";
-
     // encrypt message for verification
     encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
-    // print("in function: $encryptedMsgBytes");
+    print("in function: $encryptedMsgBytes");
   }
 
   //decrypt message
@@ -130,8 +130,9 @@ class CertificateTemplate {
 
   bool verifyCert2(RSAPublicKey signerKey) {
     // get the cert contain 1) plaintext, 2) signed
-    print(message);
-    print(encryptedMsgBytes);
+    // print(message);
+    // print(encryptedMsgBytes);
+
     var validorNot = rsaHelper.rsaVerify(
         signerKey, message!, encryptedMsgBytes as Uint8List);
     return validorNot;
