@@ -60,7 +60,6 @@ class RsaKeyHelper {
 
     final sig = signer.generateSignature(createUint8ListFromString(plainText));
 
-    // TODO: change the list of bytes to _____
     return sig.bytes;
   }
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:real_reddit/utils/cert_check_helper.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ void main() async {
   );
 
   // ****** makeshift funct for root and admin keygen
-  // RsaKeyHelper kg = RsaKeyHelper();
+  RsaKeyHelper kg = RsaKeyHelper();
   // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
   // var pub = asym.publicKey as RSAPublicKey;
   // var pri = asym.privateKey as RSAPrivateKey;
@@ -43,6 +44,8 @@ class _MyAppState extends State<MyApp> {
   var db = FirebaseFirestore.instance;
   var certToBe = CertificateTemplate();
 
+  var certHelper = CertCheckHelper();
+
   var key = '';
 
   @override
@@ -62,12 +65,16 @@ class _MyAppState extends State<MyApp> {
               // await certToBe.sign(); // must put await
               // push cert to firebase
               // db
-              //     .collection("Users/dad/Certificates")
+              //     .collection("Users/chow/Certificates")
               //     .doc()
               //     .set(certToBe.toJson());
 
               // var verified = certToBe.verifyCert();
               // print(verified);
+
+              // print("hell0");
+              // var rest = await certHelper.checking();
+              // print(rest);
             }),
           ],
         ),
