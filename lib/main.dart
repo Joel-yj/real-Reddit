@@ -18,6 +18,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  runApp(
+    MyApp(),
+  );
   // ****** makeshift funct for root and admin keygen
   // RsaKeyHelper kg = RsaKeyHelper();
   // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
@@ -28,10 +31,6 @@ void main() async {
   // print(pri.modulus);
   // print(pri.p);
   // print(pri.q);
-
-  runApp(
-    MyApp(),
-  );
 }
 
 class MyApp extends StatelessWidget {

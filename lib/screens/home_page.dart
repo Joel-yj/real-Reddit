@@ -18,14 +18,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
-    // RsaKeyHelper test = RsaKeyHelper();
-    // var db = FirebaseFirestore.instance;
-    // var secureRan = test.getSecureRandom();
-    // var priKeyHex = (test.getRsaKeyPair(secureRan).privateKey as RSAPrivateKey)
-    //     .modulus
-    //     ?.toRadixString(16);
 
     final group = ["CZ4010", "CZ4020"];
+    const user = "Alice";
 
     return Scaffold(
       appBar: AppBar(
@@ -43,7 +38,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            CreateCertFormPage(group: group[index]),
+                            CreateCertFormPage(group: group[index], user: user),
                       ),
                     );
                   },
