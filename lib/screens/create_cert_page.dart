@@ -142,7 +142,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
     var pubKey = widget.res.publicKey as RSAPublicKey;
     // encrypt message for verification
-    cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message!);
+    cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message);
 
     db.collection("Users/${widget.user}/Certificates").doc().set(
       {
