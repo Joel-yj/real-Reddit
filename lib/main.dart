@@ -18,6 +18,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // ****** makeshift funct for root and admin keygen
+  // RsaKeyHelper kg = RsaKeyHelper();
+  // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
+  // var pub = asym.publicKey as RSAPublicKey;
+  // var pri = asym.privateKey as RSAPrivateKey;
+  // print(pub.publicExponent);
+  // print(pri.privateExponent);
+  // print(pri.modulus);
+  // print(pri.p);
+  // print(pri.q);
+
   runApp(
     MyApp(),
   );

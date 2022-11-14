@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pointycastle/asymmetric/api.dart';
@@ -8,91 +10,122 @@ class CertificateTemplate {
   String? issueBy;
   String? message;
   RSAPublicKey? subPubKey;
+  Uint8List? encryptedMsgBytes;
 
   var rsaHelper = RsaKeyHelper();
   var db = FirebaseFirestore.instance;
 
   // Constructor
   CertificateTemplate(
-      {this.receivedBy, this.issueBy, this.message, this.subPubKey});
+      {this.receivedBy,
+      this.issueBy,
+      this.message,
+      this.subPubKey,
+      this.encryptedMsgBytes});
 
   Map<String, dynamic> toJson() {
     return {
       "ReceivedBy": receivedBy,
       "IssueBy": issueBy,
-      "PublicKey": subPubKey?.publicExponent.toString(),
+      "PublicKeyEx": subPubKey?.publicExponent.toString(),
+      "PublickeyMod": subPubKey?.modulus.toString(),
       "Message": message,
+      "EncryptedMessage": encryptedMsgBytes,
     };
   }
 
-  //decrypt message
-  bool verifyCert(Uint8List encryptedMsg) {
-    //get signers public key
+  CertificateTemplate fromJson(dynamic json) {
+    RSAPublicKey rebuildKey = RSAPublicKey(
+        BigInt.parse(json["PublickeyMod"] as String),
+        BigInt.parse(json["PublicKeyEx"] as String));
 
-    // get the cert contain 1) plaintext, 2) signed
-    // var validSig = rsaHelper.rsaVerify(adminPubKey, plainText, signed);
-    return true;
+    return CertificateTemplate(
+      receivedBy: json["ReceiveBy"] as String,
+      issueBy: json["IssueBy"] as String,
+      subPubKey: rebuildKey,
+      message: json["Message"] as String,
+      encryptedMsgBytes: json["EncryptedMessage"],
+    );
   }
 
   void request() {
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-    subPubKey = res.publicKey as RSAPublicKey;
     var subPriKey = res.privateKey as RSAPrivateKey;
-    print(subPriKey.privateExponent);
 
-    // put receiveby(alice)
+    // put receiveby(alice) TODO: no hardcode?
+    receivedBy = "dad";
+
+    // TODO: do ELSEWHERE
+    // update firebase for Alice private key
+    db.collection("Users").doc(receivedBy).set({
+      "PrivateKey": subPriKey.privateExponent.toString(),
+      "Modulus": subPriKey.modulus.toString(),
+      "p": subPriKey.p.toString(),
+      "q": subPriKey.q.toString()
+    }, SetOptions(merge: true));
+
     // public key into the cert template
-
-    // update firebase alice
-    db.collection("Users").doc("Alice").set(
-        {"PrivateKey": subPriKey.privateExponent.toString()},
-        SetOptions(merge: true));
-
-    // var cert = {
-    //   "IssuedBy": "",
-    //   "ReceivedBy": "Alice",
-    //   "message": "",
-    //   "PublicKey": alicePubKey.publicExponent.toString(),
-    // };
-
-    // db
-    //     .collection("Users")
-    //     .doc("Alice")
-    //     .collection("Certificates")
-    //     .doc()
-    //     .set(cert, SetOptions(merge: true));
+    subPubKey = res.publicKey as RSAPublicKey;
   }
 
-  // void signing() {
-  //   // make a string: "${new participant} belongs to ${lesson}"
-  //   String plainText = "This is a test msg";
+  //TODO: #JOEL# sign(String lesson) - input grp name
+  Future<void> sign() async {
+    // make a string: "${new participant} belongs to ${lesson}"
+    message = "This is a test msg";
 
-  //   // get {lesson} private key and sign
-  //   var signerPrikey = db.collection("Users").doc("CE4010").get
-  //   // var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-  //   // var adminPubKey = res.publicKey as RSAPublicKey;
-  //   // var adminPriKey = res.privateKey as RSAPrivateKey;
+    // get {lesson} private key and sign
+    var signerPrikey = db
+        .collection("Users") //lesson
+        .doc("CZ4010")
+        .get()
+        .then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
 
-  //   var signed = rsaHelper.rsaSign(adminPriKey, plainText);
-  //   print(signed);
+      // retrive signers private key
+      RSAPrivateKey rebuildKey = RSAPrivateKey(
+          BigInt.parse(data["Modulus"] as String),
+          BigInt.parse(data["PrivateKey"] as String),
+          BigInt.parse(data["p"] as String),
+          BigInt.parse(data["q"] as String));
 
-  //   var cert = {
-  //     "IssuedBy": "Admin",
-  //     "message": plainText,
-  //     "encryptedMsg": signed,
-  //   };
+      return rebuildKey;
+    });
 
-  //   db
-  //       .collection("Users")
-  //       .doc("Alice")
-  //       .collection("Certificates")
-  //       .doc()
-  //       .set(cert, SetOptions(merge: true));
+    // issue by ${lesson}
+    issueBy = "CZ4010";
 
-  //   var readSigned = rsaHelper.rsaVerify(adminPubKey, plainText, signed);
-  //   print(readSigned);
-  // }
+    // encrypt message for verification
+    encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
+    print("in function: $encryptedMsgBytes");
+  }
+
+  //decrypt message
+  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
+  Future<bool> verifyCert() async {
+    //get signers public key
+    var signer = "CZ4010";
+    var signerKey =
+        db.collection("Users").doc(signer).get().then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+
+      // retrive signers private key
+      RSAPrivateKey rebuildKey = RSAPrivateKey(
+          BigInt.parse(data["Modulus"] as String),
+          BigInt.parse(data["PrivateKey"] as String),
+          BigInt.parse(data["p"] as String),
+          BigInt.parse(data["q"] as String));
+
+      RSAPublicKey pubKey =
+          RSAPublicKey(rebuildKey.modulus!, BigInt.from(65537));
+      return pubKey;
+    });
+
+    // get the cert contain 1) plaintext, 2) signed
+    var validorNot = rsaHelper.rsaVerify(
+        await signerKey, message!, encryptedMsgBytes as Uint8List);
+    return validorNot;
+  }
 
   void updateCertBase() {}
 }
