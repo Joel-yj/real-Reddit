@@ -49,6 +49,7 @@ class CertificateTemplate {
     );
   }
 
+//---------------processes-----------
   void request() {
     // put receiveby(alice) TODO: no hardcode?
     receiveBy = "chow";

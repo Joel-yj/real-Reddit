@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'package:real_reddit/screens/create_cert_page.dart';
+import 'package:real_reddit/screens/group_view_page.dart';
+
 import 'package:real_reddit/utils/cert_check_helper.dart';
+
 import 'firebase_options.dart';
 
 import 'package:flutter/material.dart';
@@ -17,6 +22,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  runApp(
+    MyApp(),
+  );
   // ****** makeshift funct for root and admin keygen
   RsaKeyHelper kg = RsaKeyHelper();
   // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
@@ -27,59 +35,24 @@ void main() async {
   // print(pri.modulus);
   // print(pri.p);
   // print(pri.q);
-
-  runApp(
-    MyApp(),
-  );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
-  var db = FirebaseFirestore.instance;
-  var certToBe = CertificateTemplate();
-
-  var certHelper = CertCheckHelper();
-
-  var key = '';
+  // var certToBe = CertificateTemplate();
+  // var db = FirebaseFirestore.instance;
+  // RsaKeyHelper rsahelp = RsaKeyHelper();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'RSA Generator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            Text(key),
-            FloatingActionButton(onPressed: () async {
-              // certToBe.request();
-              // await certToBe.sign(); // must put await
-              // push cert to firebase
-              // db
-              //     .collection("Users/chow/Certificates")
-              //     .doc()
-              //     .set(certToBe.toJson());
-
-              // var verified = certToBe.verifyCert();
-              // print(verified);
-
-              // print("hell0");
-              // var rest = await certHelper.checking();
-              // print(rest);
-            }),
-          ],
-        ),
-      ),
-      // home: MyHomePage(title: 'RSA Key Generator'),
+      home: HomePage(),
     );
   }
 }
