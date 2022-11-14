@@ -24,6 +24,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   CertificateTemplate cert = CertificateTemplate();
   var db = FirebaseFirestore.instance;
   late String message = "${widget.user} belongs to ${widget.group}";
+  bool genEncryptedMsg = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,12 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                           TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                     ),
                     ElevatedButton(
-                      onPressed: sign,
+                      onPressed: () {
+                        sign();
+                        setState(() {
+                          genEncryptedMsg = true;
+                        });
+                      },
                       child: Text(
                         "Generate",
                         style: TextStyle(fontSize: 30),
@@ -77,18 +83,41 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                     ),
                   ],
                 ),
-                Align(
-                  alignment: Alignment.center,
-                  child: RichText(
-                    text: TextSpan(style: TextStyle(fontSize: 35), children: [
-                      TextSpan(
-                          text: "Message: ",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          text: message),
-                    ]),
+                if (genEncryptedMsg == true)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RichText(
+                        text:
+                            TextSpan(style: TextStyle(fontSize: 35), children: [
+                          TextSpan(
+                              text: "Message: ",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          TextSpan(text: message),
+                        ]),
+                      ),
+                    ],
                   ),
-                ),
+                if (genEncryptedMsg == true)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RichText(
+                        text:
+                            TextSpan(style: TextStyle(fontSize: 35), children: [
+                          TextSpan(
+                              text: "Encrypted Message: ",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ]),
+                      ),
+                      Flexible(
+                        child: Text(
+                          cert.encryptedMsgBytes.toString(),
+                        style: TextStyle(fontSize: 35),),
+                      ),
+                    ],
+                  ),
+               // ElevatedButton(onPressed: (){}, child: child)
               ],
             ),
           ),
@@ -98,36 +127,25 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   }
 
 
-
-    // update firebase for User's public key
-    // var certCol = db.collection("Users/Certificates");
-    // certCol.where("IssueBy", isEqualTo: widget.group).get().then((value) {
-    //   for (var element in value.docs) {
-    //     certCol
-    //         .doc(element.id)
-    //         .set({"PublicKeyEx": res.publicKey.toString() as RSAPublicKey},SetOptions(merge: true));
-    //   }
-    // });
-
-  //TODO: #JOEL# sign(String lesson) - input grp name
-  void sign()  {
+  void sign() {
     // get {lesson} private key and sign
     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
     var pubKey = widget.res.publicKey as RSAPublicKey;
     // encrypt message for verification
     cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message!);
 
-
-    db.collection("Users/${widget.user}/Certificates").doc().set({
+    db.collection("Users/${widget.user}/Certificates").doc().set(
+      {
         "IssueBy": widget.group,
-        "Message" : message,
-    "PublicKeyEx" : pubKey.publicExponent.toString(),
-    "ReceiveBy" : widget.user,
-    "PublicKeyMod": pubKey.modulus.toString(),
-    "EncryptedMessage":cert.encryptedMsgBytes},);
+        "Message": message,
+        "PublicKeyEx": pubKey.publicExponent.toString(),
+        "ReceiveBy": widget.user,
+        "PublicKeyMod": pubKey.modulus.toString(),
+        "EncryptedMessage": cert.encryptedMsgBytes
+      },
+    );
 
-    print("in function: ${cert.encryptedMsgBytes}");
-
+    //print("in function: ${cert.encryptedMsgBytes}");
   }
 
   //decrypt message
