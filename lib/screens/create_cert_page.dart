@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/objects/certificate.dart';
+import 'package:real_reddit/screens/group_view_page.dart';
 import 'package:real_reddit/screens/home_page.dart';
 import 'package:real_reddit/objects/certificate.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
@@ -113,11 +114,21 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       Flexible(
                         child: Text(
                           cert.encryptedMsgBytes.toString(),
-                        style: TextStyle(fontSize: 35),),
+                          style: TextStyle(fontSize: 35),
+                        ),
                       ),
                     ],
                   ),
-               // ElevatedButton(onPressed: (){}, child: child)
+                if (genEncryptedMsg == true)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GroupViewPage()));
+                    },
+                    child: Text("Submit"),
+                  )
               ],
             ),
           ),
@@ -125,7 +136,6 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
       ),
     );
   }
-
 
   void sign() {
     // get {lesson} private key and sign
