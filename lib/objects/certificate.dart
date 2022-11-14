@@ -28,7 +28,7 @@ class CertificateTemplate {
       "ReceiveBy": receiveBy,
       "IssueBy": issueBy,
       "PublicKeyEx": subPubKey?.publicExponent.toString(),
-      "PublickeyMod": subPubKey?.modulus.toString(),
+      "PublicKeyMod": subPubKey?.modulus.toString(),
       "Message": message,
       "EncryptedMessage": encryptedMsgBytes,
     };
@@ -36,15 +36,16 @@ class CertificateTemplate {
 
   CertificateTemplate fromJson(dynamic json) {
     RSAPublicKey rebuildKey = RSAPublicKey(
-        BigInt.parse(json["PublickeyMod"] as String),
+        BigInt.parse(json["PublicKeyMod"] as String),
         BigInt.parse(json["PublicKeyEx"] as String));
 
+    List<int> toList = (List.from(json["EncryptedMessage"]));
     return CertificateTemplate(
       receiveBy: json["ReceiveBy"] as String,
       issueBy: json["IssueBy"] as String,
       subPubKey: rebuildKey,
       message: json["Message"] as String,
-      encryptedMsgBytes: json["EncryptedMessage"],
+      encryptedMsgBytes: Uint8List.fromList(toList),
     );
   }
 
@@ -97,7 +98,7 @@ class CertificateTemplate {
 
     // encrypt message for verification
     encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message!);
-    print("in function: $encryptedMsgBytes");
+    // print("in function: $encryptedMsgBytes");
   }
 
   //decrypt message
@@ -127,5 +128,12 @@ class CertificateTemplate {
     return validorNot;
   }
 
-  void updateCertBase() {}
+  bool verifyCert2(RSAPublicKey signerKey) {
+    // get the cert contain 1) plaintext, 2) signed
+    print(message);
+    print(encryptedMsgBytes);
+    var validorNot = rsaHelper.rsaVerify(
+        signerKey, message!, encryptedMsgBytes as Uint8List);
+    return validorNot;
+  }
 }
