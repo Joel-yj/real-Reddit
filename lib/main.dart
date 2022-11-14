@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:real_reddit/screens/create_cert_page.dart';
 import 'package:real_reddit/screens/group_view_page.dart';
+
+import 'package:real_reddit/utils/cert_check_helper.dart';
+
 import 'firebase_options.dart';
 
 import 'package:flutter/material.dart';
@@ -22,7 +26,7 @@ void main() async {
     MyApp(),
   );
   // ****** makeshift funct for root and admin keygen
-  // RsaKeyHelper kg = RsaKeyHelper();
+  RsaKeyHelper kg = RsaKeyHelper();
   // var asym = kg.getRsaKeyPair(kg.getSecureRandom());
   // var pub = asym.publicKey as RSAPublicKey;
   // var pri = asym.privateKey as RSAPrivateKey;
