@@ -70,18 +70,25 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       style:
                           TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        sign();
-                        setState(() {
-                          genEncryptedMsg = true;
-                        });
-                      },
-                      child: Text(
-                        "Generate",
-                        style: TextStyle(fontSize: 30),
+                    if (genEncryptedMsg == false)
+                      ElevatedButton(
+                        onPressed: () {
+                          sign();
+                          setState(() {
+                            genEncryptedMsg = true;
+                          });
+                        },
+                        child: Text(
+                          "Generate",
+                          style: TextStyle(fontSize: 30),
+                        ),
                       ),
-                    ),
+                    if (genEncryptedMsg == true)
+                      Text(
+                        "Key Generated",
+                        style:
+                        TextStyle(fontSize: 35),
+                      ),
                   ],
                 ),
                 if (genEncryptedMsg == true)
