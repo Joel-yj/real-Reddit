@@ -54,6 +54,7 @@ class CertificateTemplate {
 //---------------processes-----------
   Future<void> request() async {
     // *NEW* get both issue and receive by HERE
+    // used in home_page.dart
     receiveBy = "gogo";
     issueBy = "CE3003";
 
@@ -121,6 +122,7 @@ class CertificateTemplate {
   }
 
   //TODO: #JOEL# sign(String lesson) - input grp name
+  // used in create_cert_page.dart
   Future<void> sign() async {
     // make a string: "${new participant} belongs to ${lesson}"
     message = "$issueBy signs for chow";

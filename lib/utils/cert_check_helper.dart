@@ -14,14 +14,15 @@ class CertCheckHelper {
   // 1) get trusted source pub key
   // 2) dumb out all cert of users in certificate, manage with data struct
   // 3) go thru certs in a chain to check validity
-  Future<bool> checking() async {
-    String user = "chow"; // TODO:user is chow
+  Future<bool> checking(String oldUser, String newUser) async {
+    //String user = "chow"; // TODO:user is chow
     List<CertificateTemplate> listOfCert = [];
 
     // Look in trust store find "Root"
     // generate TrustedSource("Root", Root Public Key)
+    // looking for old user's trusted
     var trustKey = db
-        .collection("Users/$user/TrustedSource")
+        .collection("Users/$oldUser/TrustedSource")
         .doc("Root")
         .get()
         .then((DocumentSnapshot doc) {
@@ -37,7 +38,8 @@ class CertCheckHelper {
     var source = TrustedSource(id: "Root", key: await trustKey);
 
     //------ create Data Structures of all certs
-    var allCert = db.collection("Users/$user/Certificates").get().then((res) {
+    // data of current user
+    var allCert = db.collection("Users/$newUser/Certificates").get().then((res) {
       List<CertificateTemplate> list = [];
       var certificate = CertificateTemplate();
       for (var certJson in res.docs) {
@@ -63,7 +65,7 @@ class CertCheckHelper {
         return false;
       }
 
-      if (currentCert.receiveBy == user) break;
+      if (currentCert.receiveBy == newUser) break;
       issuerKey = currentCert.subPubKey;
       currentCert = listOfCert[hashMap[currentCert.receiveBy] as int];
     } while (true);

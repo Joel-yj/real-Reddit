@@ -24,7 +24,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   var rsaHelper = RsaKeyHelper();
   CertificateTemplate cert = CertificateTemplate();
   var db = FirebaseFirestore.instance;
-  late String message = "${widget.user} belongs to ${widget.group}";
+  late String message = "${widget.group} signs for ${widget.user}";
   bool genEncryptedMsg = false;
 
   @override
@@ -66,7 +66,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Key: ",
+                      "Certificate: ",
                       style:
                           TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                     ),
@@ -79,13 +79,13 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                           });
                         },
                         child: Text(
-                          "Generate",
+                          "Request",
                           style: TextStyle(fontSize: 30),
                         ),
                       ),
                     if (genEncryptedMsg == true)
                       Text(
-                        "Key Generated",
+                        "Certificate Generated",
                         style:
                         TextStyle(fontSize: 35),
                       ),
@@ -150,7 +150,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     );
   }
 
-  void sign() {
+  CertificateTemplate sign() {
     // get {lesson} private key and sign
     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
     var pubKey = widget.res.publicKey as RSAPublicKey;
@@ -167,26 +167,9 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
         "EncryptedMessage": cert.encryptedMsgBytes
       },
     );
+    return cert;
 
     //print("in function: ${cert.encryptedMsgBytes}");
   }
 
-  //decrypt message
-  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
-  // bool verifyCert() {
-  //   //get signers public key
-  //   var signer = widget.group;
-  //   var signerKey = widget.priKey;
-  //
-  //
-  //
-  //     RSAPublicKey pubKey =
-  //     RSAPublicKey(signerKey.modulus!, BigInt.from(65537));
-  //     return pubKey;
-  //
-  //   // get the cert contain 1) plaintext, 2) signed
-  //   var validorNot = rsaHelper.rsaVerify(
-  //       await signerKey, message!, encryptedMsgBytes as Uint8List);
-  //   return validorNot;
-  // }
 }

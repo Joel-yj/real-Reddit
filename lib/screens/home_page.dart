@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "new-joel-test";
+  final user = "jason-demo";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;
@@ -25,12 +25,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
-    final group = ["CZ4010", "CZ4020"];
+    final group = ["CZ4010", "CZ4020", "Root"];
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('RSA Certificate App'),
+        title: Text('Groups'),
       ),
       body: ListView.builder(
           itemCount: group.length,
