@@ -52,9 +52,10 @@ class CertificateTemplate {
   }
 
 //---------------processes-----------
-  void request() {
-    // put receiveby(alice) TODO: no hardcode?
-    receiveBy = "chow";
+  Future<void> request() async {
+    // *NEW* get both issue and receive by HERE
+    receiveBy = "gogo";
+    issueBy = "CE3003";
 
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
@@ -72,15 +73,30 @@ class CertificateTemplate {
       "p": subPriKey.p.toString(),
       "q": subPriKey.q.toString(),
     };
-    db
-        .collection("Users")
-        .doc(receiveBy)
-        .set(subPriJson, SetOptions(merge: true));
 
-    // store to local
-    var storage = LocalStorage("UsersKey");
-    storage.setItem(
-        "$receiveBy-CZ4010", subPriJson); // TODO: dependency on lesson
+    db
+        .collection("Users/$receiveBy/PrivateKeyCollection")
+        .doc(issueBy)
+        .get()
+        .then((doc) {
+      if (!doc.exists) {
+        // put into db if dont have key yet
+        db
+            .collection("Users/$receiveBy/PrivateKeyCollection")
+            .doc(issueBy)
+            .set(subPriJson, SetOptions(merge: true));
+
+        // TODO: store to local
+        // var storage = LocalStorage("UsersKey");
+        // await storage.ready;
+        // storage.setItem("$receiveBy-$issueBy", subPriJson);
+        // print(await storage.getItem("$receiveBy-$issueBy"));
+      } else {
+        // got key for tat class
+        // TODO: refresh only if invalid
+        print("already exist");
+      }
+    });
 
     // public key into the cert template
     subPubKey = res.publicKey as RSAPublicKey;
@@ -106,9 +122,6 @@ class CertificateTemplate {
 
   //TODO: #JOEL# sign(String lesson) - input grp name
   Future<void> sign() async {
-    // issue by ${lesson}
-    issueBy = "CE1103";
-
     // make a string: "${new participant} belongs to ${lesson}"
     message = "$issueBy signs for chow";
 
