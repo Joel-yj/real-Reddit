@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/objects/certificate.dart';
-import 'package:real_reddit/screens/group_view_page.dart';
+import 'package:real_reddit/screens/friend_view_page.dart';
 import 'package:real_reddit/screens/home_page.dart';
 import 'package:real_reddit/objects/certificate.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
@@ -86,8 +86,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                     if (genEncryptedMsg == true)
                       Text(
                         "Certificate Generated",
-                        style:
-                        TextStyle(fontSize: 35),
+                        style: TextStyle(fontSize: 35),
                       ),
                   ],
                 ),
@@ -132,10 +131,8 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GroupViewPage(
-                            group: widget.group,
+                          builder: (context) => FriendViewPage(
                             user: widget.user,
-                            res: widget.res,
                           ),
                         ),
                       );
@@ -171,5 +168,4 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
 
     //print("in function: ${cert.encryptedMsgBytes}");
   }
-
 }

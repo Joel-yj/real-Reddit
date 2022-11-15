@@ -10,29 +10,24 @@ import 'package:real_reddit/utils/rsa_key_helper.dart';
 import 'package:real_reddit/utils/cert_check_helper.dart';
 import '../objects/certificate.dart';
 
-class GroupViewPage extends StatefulWidget {
-  const GroupViewPage(
-  {super.key, required this.group, required this.user,
-  required this.res}
-      );
+class FriendViewPage extends StatefulWidget {
+  const FriendViewPage({
+    super.key,
+    required this.user,
+  });
   final String user;
-  final String group;
-  final AsymmetricKeyPair res;
 
   @override
-  _GroupViewPageState createState() => _GroupViewPageState();
+  _FriendViewPageState createState() => _FriendViewPageState();
 }
 
-class _GroupViewPageState extends State<GroupViewPage> {
+class _FriendViewPageState extends State<FriendViewPage> {
   var rsaHelper = RsaKeyHelper();
   var db = FirebaseFirestore.instance;
-  var valid;
   var checker = CertCheckHelper();
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Implement Certificate check algorithm
-
     //TODO: search database for users
     // who have this cert and display
     final titles = ["Bob", "Malicious"];
@@ -49,16 +44,17 @@ class _GroupViewPageState extends State<GroupViewPage> {
                 title: Text(titles[index]),
                 trailing: ElevatedButton.icon(
                   onPressed: () {
-                    setState(() {
-                    });
-                    valid = checker.checking(titles[index],widget.user);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CertViewPage(
-                        group: widget.group,
-                        user: widget.user,
-                        res: widget.res,
-                    valid: valid),
-                    )
-                    );},
+                    setState(() {});
+                    var valid = checker.checking(titles[index], widget.user);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CertViewPage(
+                            oldUser: titles[index],
+                            curUser: widget.user,
+                          ),
+                        ));
+                  },
                   icon: Icon(Icons.message),
                   label: Text('Message'),
                 ),

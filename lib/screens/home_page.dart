@@ -5,6 +5,7 @@ import 'package:pointycastle/api.dart' as crypto;
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/objects/certificate.dart';
+import 'package:real_reddit/screens/friend_view_page.dart';
 import 'package:real_reddit/utils/dependency_provider.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
 import 'create_cert_page.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "jason-demo";
+  final user = "test-buttons";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
-    final group = ["CZ4010", "CZ4020", "Root"];
+    final group = ["CZ4010", "CZ4020", "Root", "joel-test1", "Bob"];
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
@@ -61,6 +62,18 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FriendViewPage(
+                user: user,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -89,7 +102,6 @@ class _HomePageState extends State<HomePage> {
             .collection("Users/$user/PrivateKeyCollection")
             .doc(issueBy)
             .set(subPriJson, SetOptions(merge: true));
-
       } else {
         // got key for tat class
         // TODO: refresh only if invalid

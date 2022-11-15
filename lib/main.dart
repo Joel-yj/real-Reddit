@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:real_reddit/screens/create_cert_page.dart';
-import 'package:real_reddit/screens/group_view_page.dart';
+import 'package:real_reddit/screens/friend_view_page.dart';
 
 import 'package:real_reddit/utils/cert_check_helper.dart';
 
