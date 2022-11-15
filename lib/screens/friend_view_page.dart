@@ -30,27 +30,27 @@ class _FriendViewPageState extends State<FriendViewPage> {
   Widget build(BuildContext context) {
     //TODO: search database for users
     // who have this cert and display
-    final titles = ["Bob", "Malicious"];
+
+    final allUsers = ["Bob", "Malicious"];
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Friends'),
       ),
       body: ListView.builder(
-          itemCount: titles.length,
+          itemCount: allUsers.length,
           itemBuilder: (context, index) {
             return Card(
               child: ListTile(
-                title: Text(titles[index]),
+                title: Text(allUsers[index]),
                 trailing: ElevatedButton.icon(
                   onPressed: () {
                     setState(() {});
-                    var valid = checker.checking(titles[index], widget.user);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => CertViewPage(
-                            oldUser: titles[index],
+                            oldUser: allUsers[index],
                             curUser: widget.user,
                           ),
                         ));
