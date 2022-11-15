@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
 
@@ -58,17 +60,48 @@ class CertificateTemplate {
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
     var subPriKey = res.privateKey as RSAPrivateKey;
 
-    // TODO: do ELSEWHERE
-    // update firebase for Alice private key
-    db.collection("Users").doc(receiveBy).set({
+    //  update local storage & firebase for Alice private key
+    //
+    //  local storage stores in key-value pairKey
+    //  Key = "$receiveBy-$lesson"
+    //  value = Private Key in PEM format
+
+    var subPriJson = {
       "PrivateKey": subPriKey.privateExponent.toString(),
       "Modulus": subPriKey.modulus.toString(),
       "p": subPriKey.p.toString(),
-      "q": subPriKey.q.toString()
-    }, SetOptions(merge: true));
+      "q": subPriKey.q.toString(),
+    };
+    db
+        .collection("Users")
+        .doc(receiveBy)
+        .set(subPriJson, SetOptions(merge: true));
+
+    // store to local
+    var storage = LocalStorage("UsersKey");
+    storage.setItem(
+        "$receiveBy-CZ4010", subPriJson); // TODO: dependency on lesson
 
     // public key into the cert template
     subPubKey = res.publicKey as RSAPublicKey;
+  }
+
+  Future<void> passOnCert() async {
+    // pass on cert from admin to user
+    // OR pass on cert from new to old user (maybe not)
+
+    var fromOne = "class";
+    var toAnother = "zebra";
+
+    var fromRef = db.collection("Users/$fromOne/Certificates");
+    var toRef = db.collection("Users/$toAnother/Certificates");
+
+    var copyCerts = await fromRef.where("ReceiveBy", isEqualTo: fromOne).get();
+    var writeBatch = db.batch();
+    for (var doc in copyCerts.docs) {
+      writeBatch.set(toRef.doc(doc.id), doc.data());
+      await writeBatch.commit();
+    }
   }
 
   //TODO: #JOEL# sign(String lesson) - input grp name
