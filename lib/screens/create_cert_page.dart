@@ -126,18 +126,38 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                     ],
                   ),
                 if (genEncryptedMsg == true)
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FriendViewPage(
-                            user: widget.user,
-                          ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          minimumSize: Size(165,50),
                         ),
-                      );
-                    },
-                    child: Text("Submit"),
+                        onPressed: () {
+                          //TODO Put the db writing function here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FriendViewPage(
+                                user: widget.user,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text("Submit"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(165,50),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Cancel"),
+                      ),
+                    ],
                   )
               ],
             ),
