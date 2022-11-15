@@ -10,14 +10,18 @@ import '../objects/trustedSource.dart';
 class CertCheckHelper {
   var db = FirebaseFirestore.instance;
 
+  // returns TRUE for if all the certs are valid, else FALSE
+  // 1) get trusted source pub key
+  // 2) dumb out all cert of users in certificate, manage with data struct
+  // 3) go thru certs in a chain to check validity
   Future<bool> checking() async {
-    List<CertificateTemplate> test = [];
+    String user = "chow"; // TODO:user is chow
+    List<CertificateTemplate> listOfCert = [];
 
-    // look into trust store to find
-    // 1) root
-    // 2) root public key
+    // Look in trust store find "Root"
+    // generate TrustedSource("Root", Root Public Key)
     var trustKey = db
-        .collection("Users/dad/TrustedSource")
+        .collection("Users/$user/TrustedSource")
         .doc("Root")
         .get()
         .then((DocumentSnapshot doc) {
@@ -32,45 +36,36 @@ class CertCheckHelper {
     });
     var source = TrustedSource(id: "Root", key: await trustKey);
 
-    //create list of all certs
-    var allCert = db.collection("Users/chow/Certificates").get().then((res) {
+    //------ create Data Structures of all certs
+    var allCert = db.collection("Users/$user/Certificates").get().then((res) {
       List<CertificateTemplate> list = [];
       var certificate = CertificateTemplate();
       for (var certJson in res.docs) {
-        print(certJson.id);
+        // print(certJson.id);
         var cert = certificate.fromJson(certJson.data());
         list.add(cert);
       }
       return list;
     });
 
-    test = await allCert;
-    // print(test);
-
+    listOfCert = await allCert;
     var issuerKey = source.key;
 
-    // print(test.length);
-
     Map<String?, int> hashMap = {
-      for (var cert in test) cert.issueBy: test.indexOf(cert)
+      for (var cert in listOfCert) cert.issueBy: listOfCert.indexOf(cert)
     };
+    //----------------- End of Section
 
-    // print(hashMap);
-
-    var currentCert = test[hashMap["Root"] as int];
-
+    var currentCert = listOfCert[hashMap[source.id] as int];
     do {
-      // print(currentCert.message);
       var validity = currentCert.verifyCert2(issuerKey!);
-      // print(validity);
       if (!validity) {
         return false;
       }
 
-      if (currentCert.receiveBy == "chow") break;
+      if (currentCert.receiveBy == user) break;
       issuerKey = currentCert.subPubKey;
-      // print(issuerKey!.modulus);
-      currentCert = test[hashMap[currentCert.receiveBy] as int];
+      currentCert = listOfCert[hashMap[currentCert.receiveBy] as int];
     } while (true);
 
     return true;
