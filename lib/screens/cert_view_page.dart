@@ -35,6 +35,9 @@ class _CertViewPage extends State<CertViewPage> {
         future: valid,
         builder: (context, snapshot) {
           if (snapshot.data == null) {
+            print(widget.oldUser);
+            print(widget.curUser);
+            print(snapshot.data);
             // cannot find trusted source block
             return Column(
               children: [Text("data1")],
@@ -44,7 +47,6 @@ class _CertViewPage extends State<CertViewPage> {
             return Column(
               children: [Text('${widget.oldUser} has a verified Certificate'),
               // print certificate hierarchy
-
               ],
             );
           } else {

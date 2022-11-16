@@ -28,6 +28,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   var db = FirebaseFirestore.instance;
   late String message = "${widget.group} signs for ${widget.user}";
   bool genEncryptedMsg = false;
+  late String msg;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +77,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       ElevatedButton(
                         onPressed: () {
                           step2();
+                          msg = getEncryptedMsg();
                           setState(() => genEncryptedMsg = true);
                         },
                         child: Text(
@@ -118,10 +120,8 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                         ]),
                       ),
                       Flexible(
-                        child: Text(
-                          cert.encryptedMsgBytes.toString(),
-                          style: TextStyle(fontSize: 35),
-                        ),
+                        child: Text(msg,
+                        style: TextStyle(fontSize: 35),),
                       ),
                     ],
                   ),
@@ -238,6 +238,24 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
 
 //     //print("in function: ${cert.encryptedMsgBytes}");
 //   }
+  String getEncryptedMsg() {
+    var user = widget.user;
+
+    // get {lesson} private key and sign
+    Future<String> test = db
+        .collection("Users/$user/Certificates")
+        .where('ReceiveBy', isEqualTo: user)
+        .get()
+        .then((value) {
+      for (var element in value.docs) {
+        String msg = element['EncryptedMessage'].toString();
+        return msg;
+      }
+      return '';
+    });
+    test.then((value) => msg = value);
+    return msg;
+  }
 
   void step3push() {
     var subPriKey = widget.res.privateKey as RSAPrivateKey;
