@@ -14,7 +14,7 @@ class CertCheckHelper {
   // 1) get trusted source pub key
   // 2) dumb out all cert of users in certificate, manage with data struct
   // 3) go thru certs in a chain to check validity
-  Future<bool> checking() async {
+  Future<bool> checking(String oldUser, String curUser) async {
     String oldUser = "chow"; // TODO:user is chow joins test-class1
     String newUser = "jason";
     List<CertificateTemplate> listOfCert = [];
