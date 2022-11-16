@@ -20,28 +20,41 @@ class CertCheckHelper {
     // String newUser = "jason";
     List<CertificateTemplate> listOfCert = [];
 
+    print("$oldUser checking $newUser");
+
     // Look in trust store find "Root"
     // generate TrustedSource("Root", Root Public Key)
-    var trustKey = db
+    var sourceDB = db
         .collection("Users/$oldUser/TrustedSource")
         .doc("Root")
         .get()
         .then((DocumentSnapshot doc) {
+      print("trusted source ${doc.exists}");
       final data = doc.data() as Map<String, dynamic>;
+      print(data.keys);
 
-      var test = TrustedSource.fromJson(data);
-      print(test.key!.publicExponent);
+      var builtSource = TrustedSource.fromJson(data);
+      // print(builtSource.id);  // DEBUGGING
+      // print(builtSource.key!.modulus);
+
       //  retrive Root public key
-      RSAPublicKey rebuildKey = RSAPublicKey(
-          BigInt.parse(data["Modulus"] as String),
-          BigInt.parse(data["PublicKey"] as String));
+      // RSAPublicKey rebuildKey = RSAPublicKey(
+      //     BigInt.parse(data["Modulus"] as String),
+      //     BigInt.parse(data["PublicKey"] as String));
 
-      return rebuildKey;
+      // var builtSource = TrustedSource(
+      //   id: data["id"],
+      //   key: rebuildKey,
+      // );
+      // print(builtSource.id);
+
+      return builtSource;
     });
-    var source = TrustedSource(id: "Root", key: await trustKey);
+    // var source = TrustedSource(id: "testRoot", key: await trustKey); // TODO:BUG
+    var source = await sourceDB;
 
     //------ create Data Structures of all certs
-    // data of current user
+    // certs of current user
     var allCert =
         db.collection("Users/$newUser/Certificates").get().then((res) {
       List<CertificateTemplate> list = [];
@@ -56,18 +69,31 @@ class CertCheckHelper {
 
     listOfCert = await allCert;
     var issuerKey = source.key;
+    // print("length of cert in newUser ${listOfCert.length}");
+    // print("issuer key: ${issuerKey!.modulus}");
 
     Map<String?, int> hashMap = {
       for (var cert in listOfCert) cert.issueBy: listOfCert.indexOf(cert)
     };
-    //----------------- End of Section
 
-    var currentCert = listOfCert[hashMap[source.id] as int];
-    do {
-      var validity = currentCert.verifyCert2(issuerKey!);
-      if (!validity) {
+    print(hashMap);
+    //----------------- End of Section
+    // print(source.id);
+
+    for (var key in hashMap.keys) {
+      if (key != source.id) {
+        print("the certs in new guy dont have a cert signed by trustedSource");
         return false;
       }
+    }
+
+    var currentCert = listOfCert[hashMap[source.id as String] as int];
+    // print(currentCert);
+    // print("start of chain: ${currentCert.issueBy}");
+    do {
+      var validity = currentCert.verifyCert2(issuerKey!);
+      print("cert is valid: $validity");
+      if (!validity) return false;
 
       if (currentCert.receiveBy == newUser) break;
       issuerKey = currentCert.subPubKey;
