@@ -23,38 +23,61 @@ class CertViewPage extends StatefulWidget {
 
 class _CertViewPage extends State<CertViewPage> {
   var rsaHelper = RsaKeyHelper();
-  var db = FirebaseFirestore.instance;
   var checker = CertCheckHelper();
+
 
   @override
   Widget build(BuildContext context) {
     var valid = checker.checking(widget.oldUser, widget.curUser);
-    // TODO: implement Cert form builder
+    var db = FirebaseFirestore.instance.collection("Users/${widget.oldUser}/Certificates");
+
     return SafeArea(
-      child: FutureBuilder<bool>(
-        future: valid,
-        builder: (context, snapshot) {
-          if (snapshot.data == null) {
-            print(widget.oldUser);
-            print(widget.curUser);
-            print(snapshot.data);
-            // cannot find trusted source block
-            return Column(
-              children: [Text("data1")],
-            );
-          } else if (snapshot.data == true) {
-            // have matching trusted source block
-            return Column(
-              children: [Text('${widget.oldUser} has a verified Certificate'),
-              // print certificate hierarchy
-              ],
-            );
-          } else {
-            // false trusted source block
-            return Text('Error');
-          }
-        },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Certificates'),
+        ),
+        body: FutureBuilder<bool>(
+          future: valid,
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              print(widget.oldUser);
+              print(widget.curUser);
+              print(snapshot.data);
+              // cannot find trusted source block
+              return Column(
+                children: [Text("${widget.oldUser} does not have a verified Certificate")],
+              );
+            } else if (snapshot.data == true) {
+              // have matching trusted source block
+              return Column(
+                children: [
+                  Text(
+                    '${widget.curUser} has a verified Certificate',
+                    style: TextStyle(fontSize: 35),
+                  ),
+                  Text(
+                    "Connection is Secure",
+                    style: TextStyle(fontSize: 35),
+                  ),
+                  // print certificate hierarchy
+
+                ],
+              );
+            } else {
+              // false trusted source block
+              return Column(
+                children: [
+                  Text(
+                    "${widget.oldUser} is not a verified User",
+                    style: TextStyle(fontSize: 35),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
       ),
     );
   }
+
 }

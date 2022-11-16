@@ -27,14 +27,15 @@ class _HomePageState extends State<HomePage> {
     // TODO: might need to turn listview cards into children
 
     final group = [
+      "AZ4535",
+      "BE2913",
       "CZ4010",
-      "CZ4020",
+      "DR3420",
+      "MA1000",
+      "RL2307",
       "Root",
-      "joel-test1",
-      "Bob",
-      "testRoot",
-      "ClassTrial"
     ];
+
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
