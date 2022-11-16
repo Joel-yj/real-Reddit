@@ -42,7 +42,10 @@ class _CertViewPage extends State<CertViewPage> {
           } else if (snapshot.data == true) {
             // have matching trusted source block
             return Column(
-              children: [Text('data2')],
+              children: [Text('${widget.oldUser} has a verified Certificate'),
+              // print certificate hierarchy
+
+              ],
             );
           } else {
             // false trusted source block
