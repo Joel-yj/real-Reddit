@@ -7,11 +7,6 @@ import "package:pointycastle/export.dart";
 
 /// Helper class to handle RSA key generation and encoding
 class RsaKeyHelper {
-  Future<AsymmetricKeyPair<PublicKey, PrivateKey>> computeRSAKeyPair(
-      SecureRandom secureRandom) async {
-    return await compute(getRsaKeyPair, secureRandom);
-  }
-
   /// Generates a [SecureRandom]
   /// Returns [FortunaRandom] to be used in the [AsymmetricKeyPair] generation
   SecureRandom getSecureRandom() {
@@ -30,7 +25,7 @@ class RsaKeyHelper {
   /// including a [SecureRandom]
   AsymmetricKeyPair<PublicKey, PrivateKey> getRsaKeyPair(
       SecureRandom secureRandom) {
-    print('in RSA key pair');
+    // print('in RSA key pair');
 
     var rsapars =
         RSAKeyGeneratorParameters(BigInt.from(65537), 512, 5); // the man put 5
@@ -38,13 +33,54 @@ class RsaKeyHelper {
 
     var keyGenerator = RSAKeyGenerator();
     keyGenerator.init(params);
-    print("generating next");
+
     final pair = keyGenerator.generateKeyPair();
 
     var myPublic = pair.publicKey as RSAPublicKey;
     var myPrivate = pair.privateKey as RSAPrivateKey;
-    print(myPublic.modulus);
-    print((myPublic.modulus)?.toRadixString(16));
+
     return AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>(myPublic, myPrivate);
   }
+
+  //------------------ RSA SIGNING --------------------
+
+  // Creates a [Uint8List] from a string to be signed
+  Uint8List createUint8ListFromString(String s) {
+    var codec = const Utf8Codec(allowMalformed: true);
+    return Uint8List.fromList(codec.encode(s));
+  }
+
+  // Sign plaintext by encrypting with Private key
+  Uint8List rsaSign(RSAPrivateKey privateKey, String plainText) {
+    //final signer = Signer('SHA-256/RSA'); // Get using registry
+    var signer = RSASigner(SHA256Digest(), '0609608648016503040201');
+
+    // initialize with true, which means sign
+    signer.init(true, PrivateKeyParameter<RSAPrivateKey>(privateKey));
+
+    final sig = signer.generateSignature(createUint8ListFromString(plainText));
+
+    return sig.bytes;
+  }
+
+  // Check signature by decrypting with Public key
+  bool rsaVerify(
+      RSAPublicKey publicKey, String plainText, Uint8List signature) {
+    //final signer = Signer('SHA-256/RSA'); // Get using registry
+    final sig = RSASignature(signature);
+
+    final verifier = RSASigner(SHA256Digest(), '0609608648016503040201');
+
+    // initialize with false, which means verify
+    verifier.init(false, PublicKeyParameter<RSAPublicKey>(publicKey));
+
+    try {
+      return verifier.verifySignature(
+          createUint8ListFromString(plainText), sig);
+    } on ArgumentError {
+      return false; // for Pointy Castle 1.0.2 when signature has been modified
+    }
+  }
+
+  //------------------ End of Signing --------------------
 }
