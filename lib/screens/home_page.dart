@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
-    final group = ["CZ4010", "CZ4020", "Root", "joel-test1", "Bob"];
+    final group = ["CZ4010", "CZ4020", "Root", "joel-test1", "Bob", "testRoot"];
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       issueBy = group[index];
                     });
-                    res = request(issueBy);
+                    res = step1(issueBy);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -78,36 +78,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   // helper function to generate private public key of user
-  crypto.AsymmetricKeyPair request(String issueBy) {
+  crypto.AsymmetricKeyPair step1(String receiveBy) {
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-    var subPriKey = res.privateKey as RSAPrivateKey;
 
-    var subPriJson = {
-      "PrivateKey": subPriKey.privateExponent.toString(),
-      "Modulus": subPriKey.modulus.toString(),
-      "p": subPriKey.p.toString(),
-      "q": subPriKey.q.toString(),
-    };
-
-    // update firebase for User's private key
-    db
-        .collection("Users/$user/PrivateKeyCollection")
-        .doc(issueBy)
-        .get()
-        .then((doc) {
-      if (!doc.exists) {
-        // put into db if dont have key yet
-        db
-            .collection("Users/$user/PrivateKeyCollection")
-            .doc(issueBy)
-            .set(subPriJson, SetOptions(merge: true));
-      } else {
-        // got key for tat class
-        // TODO: refresh only if invalid
-        print("already exist");
-      }
-    });
     return res;
   }
+
+  // crypto.AsymmetricKeyPair request(String issueBy) {
+  //   // generate key pair
+  //   var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
+  //   var subPriKey = res.privateKey as RSAPrivateKey;
+
+  //   var subPriJson = {
+  //     "PrivateKey": subPriKey.privateExponent.toString(),
+  //     "Modulus": subPriKey.modulus.toString(),
+  //     "p": subPriKey.p.toString(),
+  //     "q": subPriKey.q.toString(),
+  //   };
+
+  //   // update firebase for User's private key
+  //   db
+  //       .collection("Users/$user/PrivateKeyCollection")
+  //       .doc(issueBy)
+  //       .get()
+  //       .then((doc) {
+  //     if (!doc.exists) {
+  //       // put into db if dont have key yet
+  //       db
+  //           .collection("Users/$user/PrivateKeyCollection")
+  //           .doc(issueBy)
+  //           .set(subPriJson, SetOptions(merge: true));
+  //     } else {
+  //       // got key for tat class
+  //       // TODO: refresh only if invalid
+  //       print("already exist");
+  //     }
+  //   });
+  //   return res;
+  // }
 }
