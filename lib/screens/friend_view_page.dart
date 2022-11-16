@@ -31,7 +31,7 @@ class _FriendViewPageState extends State<FriendViewPage> {
     //TODO: search database for users
     // who have this cert and display
 
-    final allUsers = ["Bob", "Malicious"];
+    final allUsers = ["Bob", "Malicious", "UserTrial", "UserBob"];
 
     return Scaffold(
       appBar: AppBar(
