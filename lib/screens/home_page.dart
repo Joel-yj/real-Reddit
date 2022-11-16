@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "UserTrial";
+  final user = "Bob";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;
@@ -27,13 +27,13 @@ class _HomePageState extends State<HomePage> {
     // TODO: might need to turn listview cards into children
 
     final group = [
+      "AZ4535",
+      "BE2913",
       "CZ4010",
-      "CZ4020",
+      "DR3420",
+      "MA1000",
+      "RL2307",
       "Root",
-      "joel-test1",
-      "Bob",
-      "testRoot",
-      "ClassTrial"
     ];
     late crypto.AsymmetricKeyPair res;
 
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
     db.collection("Users/$user/TrustedSource").doc("Root").set(
       {
         "Modulus":
-            "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
+            "9057862644420520563503839090256944515057493838064245144904947672348919001486667442907322419631436513026757377597988083495462141035751675117953306238156027",
         "PublicKey": "65537",
         "id": "Root"
       },
