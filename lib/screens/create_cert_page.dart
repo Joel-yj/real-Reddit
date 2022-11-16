@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/objects/certificate.dart';
+import 'package:real_reddit/screens/friend_view_page.dart';
 import 'package:real_reddit/screens/home_page.dart';
 import 'package:real_reddit/objects/certificate.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
@@ -23,7 +24,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   var rsaHelper = RsaKeyHelper();
   CertificateTemplate cert = CertificateTemplate();
   var db = FirebaseFirestore.instance;
-  late String message = "${widget.user} belongs to ${widget.group}";
+  late String message = "${widget.group} signs for ${widget.user}";
   bool genEncryptedMsg = false;
 
   @override
@@ -65,22 +66,28 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Key: ",
+                      "Certificate: ",
                       style:
                           TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        sign();
-                        setState(() {
-                          genEncryptedMsg = true;
-                        });
-                      },
-                      child: Text(
-                        "Generate",
-                        style: TextStyle(fontSize: 30),
+                    if (genEncryptedMsg == false)
+                      ElevatedButton(
+                        onPressed: () {
+                          sign();
+                          setState(() {
+                            genEncryptedMsg = true;
+                          });
+                        },
+                        child: Text(
+                          "Request",
+                          style: TextStyle(fontSize: 30),
+                        ),
                       ),
-                    ),
+                    if (genEncryptedMsg == true)
+                      Text(
+                        "Certificate Generated",
+                        style: TextStyle(fontSize: 35),
+                      ),
                   ],
                 ),
                 if (genEncryptedMsg == true)
@@ -113,11 +120,45 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       Flexible(
                         child: Text(
                           cert.encryptedMsgBytes.toString(),
-                        style: TextStyle(fontSize: 35),),
+                          style: TextStyle(fontSize: 35),
+                        ),
                       ),
                     ],
                   ),
-               // ElevatedButton(onPressed: (){}, child: child)
+                if (genEncryptedMsg == true)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          minimumSize: Size(165,50),
+                        ),
+                        onPressed: () {
+                          //TODO Put the db writing function here
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FriendViewPage(
+                                user: widget.user,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text("Submit"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(165,50),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Cancel"),
+                      ),
+                    ],
+                  )
               ],
             ),
           ),
@@ -126,13 +167,12 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     );
   }
 
-
-  void sign() {
+  CertificateTemplate sign() {
     // get {lesson} private key and sign
     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
     var pubKey = widget.res.publicKey as RSAPublicKey;
     // encrypt message for verification
-    cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message!);
+    cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message);
 
     db.collection("Users/${widget.user}/Certificates").doc().set(
       {
@@ -144,26 +184,8 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
         "EncryptedMessage": cert.encryptedMsgBytes
       },
     );
+    return cert;
 
     //print("in function: ${cert.encryptedMsgBytes}");
   }
-
-  //decrypt message
-  ///TODO: #JOEL# verifyCert(String lesson) - input grp name
-  // bool verifyCert() {
-  //   //get signers public key
-  //   var signer = widget.group;
-  //   var signerKey = widget.priKey;
-  //
-  //
-  //
-  //     RSAPublicKey pubKey =
-  //     RSAPublicKey(signerKey.modulus!, BigInt.from(65537));
-  //     return pubKey;
-  //
-  //   // get the cert contain 1) plaintext, 2) signed
-  //   var validorNot = rsaHelper.rsaVerify(
-  //       await signerKey, message!, encryptedMsgBytes as Uint8List);
-  //   return validorNot;
-  // }
 }

@@ -40,6 +40,7 @@ class CertCheckHelper {
     var source = TrustedSource(id: "Root", key: await trustKey);
 
     //------ create Data Structures of all certs
+    // data of current user
     var allCert =
         db.collection("Users/$newUser/Certificates").get().then((res) {
       List<CertificateTemplate> list = [];
