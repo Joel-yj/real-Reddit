@@ -8,6 +8,7 @@ import 'package:real_reddit/screens/home_page.dart';
 import 'package:real_reddit/objects/certificate.dart';
 import 'package:real_reddit/utils/cert_check_helper.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
+import 'package:flutterfire_ui/firestore.dart';
 
 class CertViewPage extends StatefulWidget {
   const CertViewPage({
@@ -25,11 +26,11 @@ class _CertViewPage extends State<CertViewPage> {
   var rsaHelper = RsaKeyHelper();
   var checker = CertCheckHelper();
 
-
   @override
   Widget build(BuildContext context) {
     var valid = checker.checking(widget.oldUser, widget.curUser);
-    var db = FirebaseFirestore.instance.collection("Users/${widget.oldUser}/Certificates");
+    var db = FirebaseFirestore.instance
+        .collection("Users/${widget.oldUser}/Certificates");
 
     return SafeArea(
       child: Scaffold(
@@ -45,7 +46,12 @@ class _CertViewPage extends State<CertViewPage> {
               print(snapshot.data);
               // cannot find trusted source block
               return Column(
-                children: [Text("${widget.oldUser} does not have a verified Certificate")],
+                children: [
+                  Text(
+                    "${widget.oldUser} does not have a verified Certificate",
+                    style: TextStyle(fontSize: 35),
+                  )
+                ],
               );
             } else if (snapshot.data == true) {
               // have matching trusted source block
@@ -60,7 +66,13 @@ class _CertViewPage extends State<CertViewPage> {
                     style: TextStyle(fontSize: 35),
                   ),
                   // print certificate hierarchy
-
+                  FirestoreListView<Map<String,dynamic>>
+                    (query: db, itemBuilder: (context,snapshot)
+                  {
+                    Map<String,dynamic> user = snapshot.data();
+                    return Text('IssueBy: ${user['IssueBy']}'
+                        'Encrypted Message : ${user['EncryptedMessage']}');
+                  })
                 ],
               );
             } else {
@@ -79,5 +91,4 @@ class _CertViewPage extends State<CertViewPage> {
       ),
     );
   }
-
 }

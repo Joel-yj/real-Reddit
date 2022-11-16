@@ -42,6 +42,7 @@ dependencies:
   basic_utils: ^5.4.2
   asn1lib: ^1.3.0
   path_provider: ^2.0.11
+  flutterfire_ui: ^0.4.3+20
 
 
 dev_dependencies:
