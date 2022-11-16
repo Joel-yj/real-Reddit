@@ -25,13 +25,14 @@ class CertViewPage extends StatefulWidget {
 class _CertViewPage extends State<CertViewPage> {
   var rsaHelper = RsaKeyHelper();
   var checker = CertCheckHelper();
+  var db = FirebaseFirestore.instance;
+  late String msg;
 
   @override
   Widget build(BuildContext context) {
     var valid = checker.checking(widget.oldUser, widget.curUser);
-    var db = FirebaseFirestore.instance
-        .collection("Users/${widget.oldUser}/Certificates");
-
+    var _userStream =
+        db.collection("Users/${widget.curUser}/Certificates").snapshots();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -55,26 +56,26 @@ class _CertViewPage extends State<CertViewPage> {
               );
             } else if (snapshot.data == true) {
               // have matching trusted source block
-              return Column(
-                children: [
-                  Text(
-                    '${widget.curUser} has a verified Certificate',
-                    style: TextStyle(fontSize: 35),
-                  ),
-                  Text(
-                    "Connection is Secure",
-                    style: TextStyle(fontSize: 35),
-                  ),
-                  // print certificate hierarchy
-                  FirestoreListView<Map<String,dynamic>>
-                    (query: db, itemBuilder: (context,snapshot)
-                  {
-                    Map<String,dynamic> user = snapshot.data();
-                    return Text('IssueBy: ${user['IssueBy']}'
-                        'Encrypted Message : ${user['EncryptedMessage']}');
-                  })
-                ],
-              );
+              return StreamBuilder(
+                  stream: _userStream,
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error');
+                    }
+                    return ListView(
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data()! as Map<String, dynamic>;
+                        return Card(
+                          child: ListTile(
+                            title: Text(data['IssueBy']),
+                            subtitle: Text(data['ReceiveBy']),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  });
             } else {
               // false trusted source block
               return Column(
