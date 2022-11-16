@@ -31,8 +31,7 @@ class _FriendViewPageState extends State<FriendViewPage> {
     //TODO: search database for users
     // who have this cert and display
 
-    //final Stream<QuerySnapshot> _userStream = db.collection('Users').snapshots();
-    final allUsers = ["Bob", "Malicious","UserBob", "UserTrial"];
+    final allUsers = ["Bob", "Malicious", "UserTrial", "UserBob"];
 
     return Scaffold(
       appBar: AppBar(
