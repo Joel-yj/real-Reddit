@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
                       issueBy = group[index];
                     });
                     res = step1(issueBy);
+                    createTrustedSource();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -126,4 +127,15 @@ class _HomePageState extends State<HomePage> {
   //   });
   //   return res;
   // }
+
+  void createTrustedSource() {
+    db.collection("Users/$user/TrustedSource").doc("Root").set(
+      {
+        "Modulus":
+            "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
+        "PublicKey": "65537",
+        "id": "Root"
+      },
+    );
+  }
 }
