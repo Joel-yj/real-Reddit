@@ -8,6 +8,7 @@ import 'package:real_reddit/screens/home_page.dart';
 import 'package:real_reddit/objects/certificate.dart';
 import 'package:real_reddit/utils/cert_check_helper.dart';
 import 'package:real_reddit/utils/rsa_key_helper.dart';
+import 'package:flutterfire_ui/firestore.dart';
 
 class CertViewPage extends StatefulWidget {
   const CertViewPage({
@@ -23,37 +24,71 @@ class CertViewPage extends StatefulWidget {
 
 class _CertViewPage extends State<CertViewPage> {
   var rsaHelper = RsaKeyHelper();
-  var db = FirebaseFirestore.instance;
   var checker = CertCheckHelper();
+  var db = FirebaseFirestore.instance;
+  late String msg;
 
   @override
   Widget build(BuildContext context) {
     var valid = checker.checking(widget.oldUser, widget.curUser);
-    // TODO: implement Cert form builder
+    var _userStream =
+        db.collection("Users/${widget.curUser}/Certificates").snapshots();
     return SafeArea(
-      child: FutureBuilder<bool>(
-        future: valid,
-        builder: (context, snapshot) {
-          if (snapshot.data == null) {
-            print(widget.oldUser);
-            print(widget.curUser);
-            print(snapshot.data);
-            // cannot find trusted source block
-            return Column(
-              children: [Text("data1")],
-            );
-          } else if (snapshot.data == true) {
-            // have matching trusted source block
-            return Column(
-              children: [Text('${widget.oldUser} has a verified Certificate'),
-              // print certificate hierarchy
-              ],
-            );
-          } else {
-            // false trusted source block
-            return Text('Error');
-          }
-        },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Certificates'),
+        ),
+        body: FutureBuilder<bool>(
+          future: valid,
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              print(widget.oldUser);
+              print(widget.curUser);
+              print(snapshot.data);
+              // cannot find trusted source block
+              return Column(
+                children: [
+                  Text(
+                    "${widget.oldUser} does not have a verified Certificate",
+                    style: TextStyle(fontSize: 35),
+                  )
+                ],
+              );
+            } else if (snapshot.data == true) {
+              // have matching trusted source block
+              return StreamBuilder(
+                  stream: _userStream,
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error');
+                    }
+                    return ListView(
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data()! as Map<String, dynamic>;
+                        return Card(
+                          child: ListTile(
+                            title: Text(data['IssueBy']),
+                            subtitle: Text(data['ReceiveBy']),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  });
+            } else {
+              // false trusted source block
+              return Column(
+                children: [
+                  Text(
+                    "${widget.oldUser} is not a verified User",
+                    style: TextStyle(fontSize: 35),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
       ),
     );
   }
