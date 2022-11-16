@@ -175,10 +175,11 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     var issuer = widget.group;
     var pubKey = widget.res.publicKey as RSAPublicKey;
 
+    print(issuer);
     // get {lesson} private key and sign
     var signerPrikey = db
         .collection("Users/$issuer/PrivateKeyCollection")
-        .doc("Root")
+        .doc("MasterKey") // TODO: find Root
         .get()
         .then((DocumentSnapshot doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -272,7 +273,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
       } else {
         // got key for tat class
         // TODO: refresh only if invalid
-        print("already exist");
+        print("already have private key exist");
       }
     });
     // -----------end of storing private Key
