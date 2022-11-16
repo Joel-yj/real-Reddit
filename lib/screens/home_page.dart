@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "test-buttons";
+  final user = "test-alice";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;
@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
                       issueBy = group[index];
                     });
                     res = step1(issueBy);
+                    createTrustedSource();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -118,4 +119,13 @@ class _HomePageState extends State<HomePage> {
   //   });
   //   return res;
   // }
+
+  void createTrustedSource(){
+    db.collection("Users/${user}/TrustedSource").doc().set(
+        {
+          "Modulus" : "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
+          "PublicKeyMod": "65537",
+          "id": "Root"
+        },);
+  }
 }
