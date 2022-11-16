@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:basic_utils/basic_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:real_reddit/objects/certificate.dart';
@@ -73,10 +75,8 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                     if (genEncryptedMsg == false)
                       ElevatedButton(
                         onPressed: () {
-                          sign();
-                          setState(() {
-                            genEncryptedMsg = true;
-                          });
+                          step2();
+                          setState(() => genEncryptedMsg = true);
                         },
                         child: Text(
                           "Request",
@@ -132,10 +132,11 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
-                          minimumSize: Size(165,50),
+                          minimumSize: Size(165, 50),
                         ),
                         onPressed: () {
                           //TODO Put the db writing function here
+                          step3push();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -150,7 +151,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
-                          minimumSize: Size(165,50),
+                          minimumSize: Size(165, 50),
                         ),
                         onPressed: () {
                           Navigator.pop(context);
@@ -167,25 +168,153 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     );
   }
 
-  CertificateTemplate sign() {
-    // get {lesson} private key and sign
-    var signerPrikey = widget.res.privateKey as RSAPrivateKey;
+  Future<void> step2() async {
+    // sign; gernerate encrypted msg
+    // var signerPrikey = widget.res.privateKey as RSAPrivateKey;
+    print("in step 2");
+    var issuer = widget.group;
     var pubKey = widget.res.publicKey as RSAPublicKey;
+
+    print(issuer);
+    // get {lesson} private key and sign
+    var signerPrikey = db
+        .collection("Users/$issuer/PrivateKeyCollection")
+        .doc("Root") // TODO: find prikey issued by Root
+        .get()
+        .then((DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+
+      // retrive signers private key
+      RSAPrivateKey rebuildKey = RSAPrivateKey(
+          BigInt.parse(data["Modulus"] as String),
+          BigInt.parse(data["PrivateKey"] as String),
+          BigInt.parse(data["p"] as String),
+          BigInt.parse(data["q"] as String));
+
+      return rebuildKey;
+    });
+
+    print((await signerPrikey).privateExponent);
+
+    // Getting Private Key from Local Storage http://localhost:8000/#/
+    // await storage.ready;
+    // var out = await storage.getItem("$receiveBy-$issuer");
+    // RSAPrivateKey shouldbe = CryptoUtils.rsaPrivateKeyFromPem(out);
+
     // encrypt message for verification
-    cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message);
+    cert.encryptedMsgBytes = rsaHelper.rsaSign(await signerPrikey, message);
+    // print("in function: $encryptedMsgBytes");
 
-    db.collection("Users/${widget.user}/Certificates").doc().set(
-      {
-        "IssueBy": widget.group,
-        "Message": message,
-        "PublicKeyEx": pubKey.publicExponent.toString(),
-        "ReceiveBy": widget.user,
-        "PublicKeyMod": pubKey.modulus.toString(),
-        "EncryptedMessage": cert.encryptedMsgBytes
-      },
-    );
-    return cert;
+    // TODO: store fields into cert
+    cert.issueBy = issuer;
+    cert.message = message;
+    cert.receiveBy = widget.user;
+    cert.subPubKey = pubKey;
 
-    //print("in function: ${cert.encryptedMsgBytes}");
+    print(cert.receiveBy);
+    print(cert.issueBy);
+    print(cert.message);
+    print(cert.encryptedMsgBytes);
+  }
+
+//   CertificateTemplate sign() {
+//     // get {lesson} private key and sign
+//     var signerPrikey = widget.res.privateKey as RSAPrivateKey;
+//     var pubKey = widget.res.publicKey as RSAPublicKey;
+//     // encrypt message for verification
+//     cert.encryptedMsgBytes = rsaHelper.rsaSign(signerPrikey, message);
+
+//     db.collection("Users/${widget.user}/Certificates").doc().set(
+//       {
+//         "IssueBy": widget.group,
+//         "Message": message,
+//         "PublicKeyEx": pubKey.publicExponent.toString(),
+//         "ReceiveBy": widget.user,
+//         "PublicKeyMod": pubKey.modulus.toString(),
+//         "EncryptedMessage": cert.encryptedMsgBytes
+//       },
+//     );
+//     return cert;
+
+//     //print("in function: ${cert.encryptedMsgBytes}");
+//   }
+
+  void step3push() {
+    var subPriKey = widget.res.privateKey as RSAPrivateKey;
+    var receiveBy = widget.user;
+    var issueBy = widget.group;
+    var storage = LocalStorage("UsersKey");
+
+    // -------push to store private key
+    var subPriJson = {
+      "PrivateKey": subPriKey.privateExponent.toString(),
+      "Modulus": subPriKey.modulus.toString(),
+      "p": subPriKey.p.toString(),
+      "q": subPriKey.q.toString(),
+    };
+
+    db
+        .collection("Users/$receiveBy/PrivateKeyCollection")
+        .doc(issueBy)
+        .get()
+        .then((doc) async {
+      if (!doc.exists) {
+        // put into db if dont have key yet
+        db
+            .collection("Users/$receiveBy/PrivateKeyCollection")
+            .doc(issueBy)
+            .set(subPriJson, SetOptions(merge: true));
+
+        // store to Local Storage of http://localhost:8000/#/
+        var priKeyPEM = CryptoUtils.encodeRSAPrivateKeyToPem(subPriKey);
+        await storage.ready;
+        storage.setItem("$receiveBy-$issueBy", priKeyPEM); // store as PEM
+        // print(await storage.getItem("$receiveBy-$issueBy"));
+      } else {
+        // got key for tat class
+        // TODO: refresh only if invalid
+        print("already have private key exist");
+      }
+    });
+    // -----------end of storing private Key
+    print(receiveBy);
+    print(issueBy);
+    // -------Store cert if uniqued
+    db
+        .collection("Users/$receiveBy/Certificates")
+        .where("IssueBy", isEqualTo: issueBy)
+        .where("ReceiveBy", isEqualTo: receiveBy)
+        .get()
+        .then((res) {
+      if (res.docs.isEmpty) {
+        print("in storing");
+        // Store certificate
+        var certJson = cert.toJson();
+        db
+            .collection("Users/$receiveBy/Certificates")
+            .doc()
+            .set(certJson, SetOptions(merge: true));
+
+        // pass the parent cert
+        passOnCert(issueBy, receiveBy);
+      } else {
+        // TODO: refresh cert?? only if invalid
+        print("HAVE: $issueBy give to $receiveBy");
+      }
+    });
+
+    // -------End of store cert
+  }
+
+  void passOnCert(String fromOne, String toAnother) async {
+    var fromRef = db.collection("Users/$fromOne/Certificates");
+    var toRef = db.collection("Users/$toAnother/Certificates");
+
+    var copyCerts = await fromRef.where("ReceiveBy", isEqualTo: fromOne).get();
+    var writeBatch = db.batch();
+    for (var doc in copyCerts.docs) {
+      writeBatch.set(toRef.doc(doc.id), doc.data());
+      await writeBatch.commit();
+    }
   }
 }

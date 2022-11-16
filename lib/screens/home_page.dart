@@ -26,7 +26,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
-    final group = ["CZ4010", "CZ4020", "Root", "joel-test1", "Bob", "testRoot"];
+    final group = [
+      "CZ4010",
+      "CZ4020",
+      "Root",
+      "joel-test1",
+      "Bob",
+      "testRoot",
+      "ClassTrial"
+    ];
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
@@ -120,12 +128,14 @@ class _HomePageState extends State<HomePage> {
   //   return res;
   // }
 
-  void createTrustedSource(){
+  void createTrustedSource() {
     db.collection("Users/$user/TrustedSource").doc().set(
-        {
-          "Modulus" : "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
-          "PublicKeyMod": "65537",
-          "id": "Root"
-        },);
+      {
+        "Modulus":
+            "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
+        "PublicKeyMod": "65537",
+        "id": "Root"
+      },
+    );
   }
 }
