@@ -32,6 +32,7 @@ class _FriendViewPageState extends State<FriendViewPage> {
     // who have this cert and display
 
     final allUsers = ["Alice", "Bond", "Charlie", "Forger", "James", "English"];
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Friends'),
