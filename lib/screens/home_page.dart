@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
   // }
 
   void createTrustedSource(){
-    db.collection("Users/${user}/TrustedSource").doc().set(
+    db.collection("Users/$user/TrustedSource").doc().set(
         {
           "Modulus" : "11037976023139553478785865256730165626987947325259528159231702031288314238550118626416679565310922785990387341063200925183352658461087225711586329387540533",
           "PublicKeyMod": "65537",
