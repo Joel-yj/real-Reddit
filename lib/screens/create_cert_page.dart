@@ -179,7 +179,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     // get {lesson} private key and sign
     var signerPrikey = db
         .collection("Users/$issuer/PrivateKeyCollection")
-        .doc("MasterKey") // TODO: find Root
+        .doc("Root") // TODO: find prikey issued by Root
         .get()
         .then((DocumentSnapshot doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -279,7 +279,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
     // -----------end of storing private Key
     print(receiveBy);
     print(issueBy);
-    //TODO: only store cert if uniqued
+    // -------Store cert if uniqued
     db
         .collection("Users/$receiveBy/Certificates")
         .where("IssueBy", isEqualTo: issueBy)
@@ -294,10 +294,27 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
             .collection("Users/$receiveBy/Certificates")
             .doc()
             .set(certJson, SetOptions(merge: true));
+
+        // pass the parent cert
+        passOnCert(issueBy, receiveBy);
       } else {
         // TODO: refresh cert?? only if invalid
         print("HAVE: $issueBy give to $receiveBy");
       }
     });
+
+    // -------End of store cert
+  }
+
+  void passOnCert(String fromOne, String toAnother) async {
+    var fromRef = db.collection("Users/$fromOne/Certificates");
+    var toRef = db.collection("Users/$toAnother/Certificates");
+
+    var copyCerts = await fromRef.where("ReceiveBy", isEqualTo: fromOne).get();
+    var writeBatch = db.batch();
+    for (var doc in copyCerts.docs) {
+      writeBatch.set(toRef.doc(doc.id), doc.data());
+      await writeBatch.commit();
+    }
   }
 }
