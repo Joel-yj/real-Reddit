@@ -31,7 +31,7 @@ class CertCheckHelper {
         .then((DocumentSnapshot doc) {
       print("trusted source ${doc.exists}");
       final data = doc.data() as Map<String, dynamic>;
-      print(data.keys);
+      // print(data["Modulus"] as String);
 
       var builtSource = TrustedSource.fromJson(data);
       // print(builtSource.id);  // DEBUGGING
@@ -80,11 +80,9 @@ class CertCheckHelper {
     //----------------- End of Section
     // print(source.id);
 
-    for (var key in hashMap.keys) {
-      if (key != source.id) {
-        print("the certs in new guy dont have a cert signed by trustedSource");
-        return false;
-      }
+    if (!hashMap.containsKey("Root")) {
+      print("the certs in new guy dont have a cert signed by trustedSource");
+      return false;
     }
 
     var currentCert = listOfCert[hashMap[source.id as String] as int];
