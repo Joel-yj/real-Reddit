@@ -78,10 +78,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   // helper function to generate private public key of user
-  crypto.AsymmetricKeyPair step1(String receiveBy) {
+  crypto.AsymmetricKeyPair step1(String issueBy) {
     // generate key pair
     var res = rsaHelper.getRsaKeyPair(rsaHelper.getSecureRandom());
-
+    // print(issueBy);
+    // print((res.publicKey as RSAPublicKey).modulus);
     return res;
   }
 
