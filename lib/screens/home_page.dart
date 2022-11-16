@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "test-buttons";
+  final user = "UserTrial";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;
@@ -26,7 +26,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: might need to turn listview cards into children
 
-    final group = ["CZ4010", "CZ4020", "Root", "joel-test1", "Bob", "testRoot"];
+    final group = [
+      "CZ4010",
+      "CZ4020",
+      "Root",
+      "joel-test1",
+      "Bob",
+      "testRoot",
+      "ClassTrial"
+    ];
     late crypto.AsymmetricKeyPair res;
 
     return Scaffold(
