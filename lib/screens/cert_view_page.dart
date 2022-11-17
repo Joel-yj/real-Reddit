@@ -49,7 +49,7 @@ class _CertViewPage extends State<CertViewPage> {
               return Column(
                 children: [
                   Text(
-                    "${widget.oldUser} does not have a verified Certificate",
+                    "${widget.oldUser} is not subset of group",
                     style: TextStyle(fontSize: 35),
                   )
                 ],
@@ -81,7 +81,7 @@ class _CertViewPage extends State<CertViewPage> {
               return Column(
                 children: [
                   Text(
-                    "${widget.oldUser} is not a verified User",
+                    "${widget.curUser} is not a verified User",
                     style: TextStyle(fontSize: 35),
                   ),
                 ],

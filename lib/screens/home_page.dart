@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var rsaHelper = RsaKeyHelper();
-  final user = "Bob";
+  final user = "test-joel";
   var db = FirebaseFirestore.instance;
   var cert = CertificateTemplate();
   late String issueBy;

@@ -120,7 +120,7 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
                         ]),
                       ),
                       Flexible(
-                        child: Text(msg,
+                        child: Text(cert.encryptedMsgBytes.toString(),
                         style: TextStyle(fontSize: 35),),
                       ),
                     ],
@@ -241,6 +241,8 @@ class _CreateCertFormPage extends State<CreateCertFormPage> {
   String getEncryptedMsg() {
     var user = widget.user;
 
+
+    print(cert.encryptedMsgBytes.toString());
     // get {lesson} private key and sign
     Future<String> test = db
         .collection("Users/$user/Certificates")
